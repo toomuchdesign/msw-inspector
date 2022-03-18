@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "module": "commonjs",
+    "target": "es2021",
+    "strict": true,
+    "esModuleInterop": true,
+    "noErrorTruncation": true,
+    "outDir": "dist",
+    "allowJs": true,
+    "declaration": true,
+    "paths": {
+      "*": ["./@types/*"]
+    }
+  },
+  "include": ["./src"]
+}

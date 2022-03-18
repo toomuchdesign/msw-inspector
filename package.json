@@ -2,17 +2,23 @@
   "name": "msw-inspector",
   "version": "0.0.0",
   "description": "Inspect requests intercepted by MSW",
-  "main": "src/index.js",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "files": [
     "src",
     "!__tests__"
   ],
   "scripts": {
-    "test": "echo \"No test specified\"",
+    "clean": "rm -rf dist",
+    "compile": "npm run clean && tsc -p tsconfig.build.json",
+    "test": "jest ./src",
+    "test:source": "npm run test:format && npm run test:ts && npm t -- --coverage",
+    "test:ts": "tsc --noEmit",
+    "test:format": "npm run prettier",
     "preversion": "npm run prepare",
     "version": "git add package.json",
     "postversion": "git push && git push --tags",
-    "prepare": "npx simple-git-hooks && npm t",
+    "prepare": "npx simple-git-hooks && npm run test:source && npm run compile",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write ."
   },
@@ -24,6 +30,7 @@
   "author": "Andrea Carraro <me@andreacarraro.it>",
   "license": "ISC",
   "devDependencies": {
+    "@types/jest": "^27.4.1",
     "jest": "^27.5.1",
     "lint-staged": "^12.0.0",
     "prettier": "^2.0.0",
@@ -32,10 +39,17 @@
     "typescript": "^4.6.2"
   },
   "peerDependencies": {
-    "msw" : ">=0.39.2"
+    "msw": ">=0.39.2"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
+  },
+  "jest": {
+    "preset": "ts-jest/presets/js-with-ts",
+    "coverageReporters": [
+      "text",
+      "lcov"
+    ]
   },
   "lint-staged": {
     "**/*.{js,json}": [
@@ -45,5 +59,8 @@
     "**/*.{md}": [
       "prettier"
     ]
+  },
+  "engines": {
+    "node": ">=v16.0.0"
   }
 }
