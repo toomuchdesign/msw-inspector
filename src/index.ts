@@ -77,7 +77,6 @@ function createMSWInspector({ server }: { server: SetupServerApi }) {
      * Setup a msw spy. Call it before tests are executed
      */
     setup() {
-      this.clear();
       // https://mswjs.io/docs/extensions/life-cycle-events#methods
       server.events.on('request:start', logRequest);
     },
@@ -93,7 +92,6 @@ function createMSWInspector({ server }: { server: SetupServerApi }) {
      * Tear down msw spy. Call it after all tests are executed
      */
     teardown() {
-      this.clear();
       server.events.removeListener('request:start', logRequest);
     },
   };

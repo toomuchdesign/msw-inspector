@@ -31,6 +31,7 @@
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^27.4.1",
+    "@types/node-fetch": "^2.6.1",
     "jest": "^27.5.1",
     "lint-staged": "^12.0.0",
     "msw": "^0.39.2",
@@ -48,10 +49,16 @@
   },
   "jest": {
     "preset": "ts-jest/presets/js-with-ts",
-    "modulePathIgnorePatterns": ["__mocks__"],
+    "testURL": "http://localhost/",
+    "modulePathIgnorePatterns": [
+      "__mocks__"
+    ],
     "coverageReporters": [
       "text",
       "lcov"
+    ],
+    "setupFilesAfterEnv": [
+      "<rootDir>/jest.setup.ts"
     ]
   },
   "lint-staged": {
