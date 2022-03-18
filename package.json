@@ -1,0 +1,35 @@
+{
+  "name": "msw-inspector",
+  "version": "0.0.0",
+  "description": "Inspect requests intercepted by MSW",
+  "main": "src/index.js",
+  "files": ["src", "!__tests__"],
+  "scripts": {
+    "test": "echo \"No test specified\"",
+    "preversion": "npm run prepare",
+    "version": "git add package.json",
+    "postversion": "git push && git push --tags",
+    "prepare": "npx simple-git-hooks && npm t",
+    "prettier": "prettier --check .",
+    "prettier:fix": "prettier --write ."
+  },
+  "keywords": [],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/toomuchdesign/msw-inspector.git"
+  },
+  "author": "Andrea Carraro <me@andreacarraro.it>",
+  "license": "ISC",
+  "devDependencies": {
+    "simple-git-hooks": "^2.0.0",
+    "lint-staged": "^12.0.0",
+    "prettier": "^2.0.0"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged"
+  },
+  "lint-staged": {
+    "**/*.{js,json}": ["prettier", "npm t"],
+    "**/*.{md}": ["prettier"]
+  }
+}
