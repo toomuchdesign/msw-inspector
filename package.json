@@ -3,7 +3,10 @@
   "version": "0.0.0",
   "description": "Inspect requests intercepted by MSW",
   "main": "src/index.js",
-  "files": ["src", "!__tests__"],
+  "files": [
+    "src",
+    "!__tests__"
+  ],
   "scripts": {
     "test": "echo \"No test specified\"",
     "preversion": "npm run prepare",
@@ -21,15 +24,26 @@
   "author": "Andrea Carraro <me@andreacarraro.it>",
   "license": "ISC",
   "devDependencies": {
-    "simple-git-hooks": "^2.0.0",
+    "jest": "^27.5.1",
     "lint-staged": "^12.0.0",
-    "prettier": "^2.0.0"
+    "prettier": "^2.0.0",
+    "simple-git-hooks": "^2.0.0",
+    "ts-jest": "^27.1.3",
+    "typescript": "^4.6.2"
+  },
+  "peerDependencies": {
+    "msw" : ">=0.39.2"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged"
   },
   "lint-staged": {
-    "**/*.{js,json}": ["prettier", "npm t"],
-    "**/*.{md}": ["prettier"]
+    "**/*.{js,json}": [
+      "prettier",
+      "npm t"
+    ],
+    "**/*.{md}": [
+      "prettier"
+    ]
   }
 }
