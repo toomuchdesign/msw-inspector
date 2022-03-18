@@ -1,1 +1,1 @@
-# Project name
+# MSW inspector
