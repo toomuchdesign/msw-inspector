@@ -16,38 +16,37 @@ type RequestLogEntry = jest.Mock<void, [RequestLogRecord]>;
  * Create a new MSW inspector instance bound to the provided msw server setup
  */
 function createMSWInspector({ server }: { server: SetupServerApi }) {
-  // Store network requests by path
-  // @TODO store absolute urls, path names or both?
+  // Store network requests by url
   const requestLog = new Map<string, RequestLogEntry>();
 
   function logRequest(req: MockedRequest): void {
     const { method, headers, body } = req;
-    const { pathname, searchParams } = req.url;
+    const { protocol, host, pathname, searchParams } = req.url;
 
+    // @TODO review key generation
+    const key = protocol + '//' + host + pathname;
     const query =
       Array.from(searchParams.keys()).length > 0
         ? Object.fromEntries(searchParams)
         : undefined;
 
     // Create an inspectionable RequestLogRecord object and store it in requestLog map
-    if (pathname) {
-      // Create a new request log entry (Jest's mock function) for current pathname, if necessary
-      if (!requestLog.has(pathname)) {
-        const newRequestLogEntry: RequestLogEntry = jest.fn();
-        requestLog.set(pathname, newRequestLogEntry);
-      }
+    // Create a new request log entry (Jest's mock function) for current pathname or absolute url, if necessary
+    if (!requestLog.has(key)) {
+      const newRequestLogEntry: RequestLogEntry = jest.fn();
+      requestLog.set(key, newRequestLogEntry);
+    }
 
-      const requestLogEntry = requestLog.get(pathname);
-      if (requestLogEntry) {
-        const requestLogRecord: RequestLogRecord = {
-          method,
-          headers: headers.all(),
-          ...(body && { body }),
-          ...(query && { query }),
-        };
+    const requestLogEntry = requestLog.get(key);
+    if (requestLogEntry) {
+      const requestLogRecord: RequestLogRecord = {
+        method,
+        headers: headers.all(),
+        ...(body && { body }),
+        ...(query && { query }),
+      };
 
-        requestLogEntry(requestLogRecord);
-      }
+      requestLogEntry(requestLogRecord);
     }
   }
 

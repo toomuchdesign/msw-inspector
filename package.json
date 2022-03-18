@@ -59,7 +59,8 @@
     ],
     "setupFilesAfterEnv": [
       "<rootDir>/jest.setup.ts"
-    ]
+    ],
+    "testEnvironment": "jsdom"
   },
   "lint-staged": {
     "**/*.{js,json}": [

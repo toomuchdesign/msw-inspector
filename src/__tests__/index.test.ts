@@ -19,18 +19,23 @@ afterAll(() => {
 });
 
 describe('msw inspector', () => {
-  it('intercepts calls', async () => {
-    await fetch('http://test.com/foo');
+  describe('absolute paths', () => {
+    it('intercepts calls', async () => {
+      await fetch('http://absolute.path');
 
-    expect(mswInspector.getCalls('/foo')).toHaveBeenCalledWith({
-      method: 'GET',
-      headers: {
-        accept: '*/*',
-        'accept-encoding': 'gzip,deflate',
-        connection: 'close',
-        host: 'test.com',
-        'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
-      },
+      expect(
+        mswInspector.getCalls('http://absolute.path/')
+      ).toHaveBeenCalledWith({
+        method: 'GET',
+        headers: {
+          accept: '*/*',
+          'accept-encoding': 'gzip,deflate',
+          connection: 'close',
+          host: 'absolute.path',
+          'user-agent':
+            'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
+        },
+      });
     });
   });
 });
