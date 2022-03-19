@@ -4,6 +4,7 @@ import { server } from './__mocks__/server';
 
 const mswInspector = createMSWInspector({
   server,
+  mockFactory: () => jest.fn(),
 });
 
 beforeAll(() => {

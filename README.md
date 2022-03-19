@@ -1,12 +1,14 @@
 # MSW inspector
 
-## How to
+## How to (with Jest)
 
 ```js
 import { createMSWInspector } from 'msw-inspector';
 import { server } from '@/mocks/server';
+
 const mswInspector = createMSWInspector({
   server,
+  mockFactory: () => jest.fn(),
 });
 
 beforeAll(() => {
@@ -25,9 +27,7 @@ describe('My test', () => {
   it('My test', async () => {
     // Perform your test preparation
 
-    expect(
-      mswInspector.getCalls(`/expected/network/request/path`)
-    ).toHaveBeenCalledWith({
+    expect(mswInspector.getCalls('http://my.url/path')).toHaveBeenCalledWith({
       method: 'GET',
       headers: {
         'my-header': 'value',

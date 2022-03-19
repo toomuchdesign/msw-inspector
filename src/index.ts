@@ -8,16 +8,18 @@ type RequestLogRecord = {
   query?: Record<string, string>;
 };
 
-// @NOTE This is the only touch point with Jest
-// @TODO Let user provide it's own framework mock function
-type RequestLogEntry = jest.Mock<void, [RequestLogRecord]>;
-
 /**
  * Create a new MSW inspector instance bound to the provided msw server setup
  */
-function createMSWInspector({ server }: { server: SetupServerApi }) {
+function createMSWInspector<FunctionMock extends Function>({
+  server,
+  mockFactory,
+}: {
+  server: SetupServerApi;
+  mockFactory: () => FunctionMock;
+}) {
   // Store network requests by url
-  const requestLog = new Map<string, RequestLogEntry>();
+  const requestLog = new Map<string, FunctionMock>();
 
   function logRequest(req: MockedRequest): void {
     const { method, headers, body } = req;
@@ -30,10 +32,10 @@ function createMSWInspector({ server }: { server: SetupServerApi }) {
         ? Object.fromEntries(searchParams)
         : undefined;
 
-    // Create an inspectionable RequestLogRecord object and store it in requestLog map
-    // Create a new request log entry (Jest's mock function) for current pathname or absolute url, if necessary
+    // Create an inspectionable request log and store it in requestLog map
+    // Create a new request log entry (a function mock of any testing framework) for current url, if necessary
     if (!requestLog.has(key)) {
-      const newRequestLogEntry: RequestLogEntry = jest.fn();
+      const newRequestLogEntry = mockFactory();
       requestLog.set(key, newRequestLogEntry);
     }
 
@@ -46,6 +48,7 @@ function createMSWInspector({ server }: { server: SetupServerApi }) {
         ...(query && { query }),
       };
 
+      // Here we call function mock on order for tests to inspect it
       requestLogEntry(requestLogRecord);
     }
   }
@@ -56,9 +59,9 @@ function createMSWInspector({ server }: { server: SetupServerApi }) {
      * Network requested are spied through msw listeners
      *
      * @param {string} path Path of a network request (`/path`)
-     * @return {*} {jest.Mock}
+     * @return {*} {FunctionMock}
      */
-    getCalls(path: string): jest.Mock {
+    getCalls(path: string): FunctionMock {
       const requestLogEntry = requestLog.get(path);
       if (requestLogEntry) {
         return requestLogEntry;
