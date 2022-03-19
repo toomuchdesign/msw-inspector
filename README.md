@@ -7,7 +7,7 @@ import { createMSWInspector } from 'msw-inspector';
 import { server } from '@/mocks/server';
 
 const mswInspector = createMSWInspector({
-  server,
+  mockSetup: server,
   mockFactory: () => jest.fn(),
 });
 

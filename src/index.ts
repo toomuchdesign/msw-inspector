@@ -1,4 +1,4 @@
-import type { MockedRequest } from 'msw';
+import type { MockedRequest, SetupWorkerApi } from 'msw';
 import type { SetupServerApi } from 'msw/node';
 
 type RequestLogRecord = {
@@ -12,10 +12,10 @@ type RequestLogRecord = {
  * Create a new MSW inspector instance bound to the provided msw server setup
  */
 function createMSWInspector<FunctionMock extends Function>({
-  server,
+  mockSetup,
   mockFactory,
 }: {
-  server: SetupServerApi;
+  mockSetup: SetupServerApi | SetupWorkerApi;
   mockFactory: () => FunctionMock;
 }) {
   // Store network requests by url
@@ -80,7 +80,7 @@ function createMSWInspector<FunctionMock extends Function>({
      */
     setup() {
       // https://mswjs.io/docs/extensions/life-cycle-events#methods
-      server.events.on('request:start', logRequest);
+      mockSetup.events.on('request:start', logRequest);
     },
 
     /**
@@ -94,7 +94,7 @@ function createMSWInspector<FunctionMock extends Function>({
      * Tear down msw spy. Call it after all tests are executed
      */
     teardown() {
-      server.events.removeListener('request:start', logRequest);
+      mockSetup.events.removeListener('request:start', logRequest);
     },
   };
 }
