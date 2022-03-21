@@ -24,7 +24,7 @@ describe('getRequests', () => {
     await fetch('http://absolute.path');
 
     expect(
-      mswInspector.getRequestsTo('http://absolute.path/')
+      mswInspector.getRequests('http://absolute.path/')
     ).toHaveBeenCalledWith({
       method: 'GET',
       headers: {
@@ -42,7 +42,7 @@ describe('getRequests', () => {
       await fetch('http://absolute.path');
 
       expect(() =>
-        mswInspector.getRequestsTo('http://it.was.never.called/')
+        mswInspector.getRequests('http://it.was.never.called/')
       ).toThrowError(
         '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://absolute.path'
       );
