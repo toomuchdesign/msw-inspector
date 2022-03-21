@@ -8,6 +8,31 @@ type RequestLogRecord = {
   query?: Record<string, string>;
 };
 
+function requestMapper(req: MockedRequest): {
+  key: string;
+  record: RequestLogRecord;
+} {
+  const { method, headers, body } = req;
+  const { protocol, host, pathname, searchParams } = req.url;
+
+  // @TODO review key generation
+  const key = protocol + '//' + host + pathname;
+  const query =
+    Array.from(searchParams.keys()).length > 0
+      ? Object.fromEntries(searchParams)
+      : undefined;
+
+  return {
+    key,
+    record: {
+      method,
+      headers: headers.all(),
+      ...(body && { body }),
+      ...(query && { query }),
+    },
+  };
+}
+
 /**
  * Create a new MSW inspector instance bound to the provided msw server setup
  */
@@ -22,15 +47,7 @@ function createMSWInspector<FunctionMock extends Function>({
   const requestLog = new Map<string, FunctionMock>();
 
   function logRequest(req: MockedRequest): void {
-    const { method, headers, body } = req;
-    const { protocol, host, pathname, searchParams } = req.url;
-
-    // @TODO review key generation
-    const key = protocol + '//' + host + pathname;
-    const query =
-      Array.from(searchParams.keys()).length > 0
-        ? Object.fromEntries(searchParams)
-        : undefined;
+    const { key, record } = requestMapper(req);
 
     // Create an inspectionable request log and store it in requestLog map
     // Create a new request log entry (a function mock of any testing framework) for current url, if necessary
@@ -41,15 +58,8 @@ function createMSWInspector<FunctionMock extends Function>({
 
     const requestLogEntry = requestLog.get(key);
     if (requestLogEntry) {
-      const requestLogRecord: RequestLogRecord = {
-        method,
-        headers: headers.all(),
-        ...(body && { body }),
-        ...(query && { query }),
-      };
-
       // Here we call function mock on order for tests to inspect it
-      requestLogEntry(requestLogRecord);
+      requestLogEntry(record);
     }
   }
 

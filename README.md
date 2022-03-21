@@ -112,6 +112,7 @@ type CallPayload = {
 
 - Consider a better name for `getRequests`
 - Consider listening to network layer with [`@mswjs/interceptors`](https://github.com/mswjs/interceptors) and make MSW inspector usable in non-`msw` projects
+- Consider accepting a function to customize requests mapping and payload
 
 [msw]: https://mswjs.io
 [msw-docs-life-cycle-events]: https://mswjs.io/docs/extensions/life-cycle-events
