@@ -21,18 +21,27 @@ afterAll(() => {
 
 describe('getRequests', () => {
   it('returns a mocked function with mathching intercepted calls for a given path', async () => {
-    await fetch('http://absolute.path');
+    await fetch('http://absolute.path?name=foo', {
+      method: 'POST',
+      body: JSON.stringify({ surname: 'bar' }),
+    });
 
     expect(
       mswInspector.getRequests('http://absolute.path/')
     ).toHaveBeenCalledWith({
-      method: 'GET',
+      method: 'POST',
       headers: {
         accept: '*/*',
         'accept-encoding': 'gzip,deflate',
         connection: 'close',
+        'content-length': '17',
+        'content-type': 'text/plain;charset=UTF-8',
         host: 'absolute.path',
         'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
+      },
+      body: JSON.stringify({ surname: 'bar' }),
+      query: {
+        name: 'foo',
       },
     });
   });

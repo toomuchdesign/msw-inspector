@@ -92,16 +92,7 @@ Each intercepted request calls the matching mocked function with the following p
 
 ```ts
 type CallPayload = {
-  method:
-    | 'CONNECT'
-    | 'DELETE'
-    | 'GET'
-    | 'HEAD'
-    | 'OPTIONS'
-    | 'PATCH'
-    | 'POST'
-    | 'PUT'
-    | 'TRACE';
+  method: string;
   headers: Record<string, string>;
   body?: any;
   query?: Record<string, string>;
