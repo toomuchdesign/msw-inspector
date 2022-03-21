@@ -5,8 +5,7 @@
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "files": [
-    "src",
-    "!__tests__"
+    "dist"
   ],
   "scripts": {
     "clean": "rm -rf dist",
@@ -22,7 +21,14 @@
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write ."
   },
-  "keywords": [],
+  "keywords": [
+    "msw",
+    "api",
+    "mock",
+    "mocking",
+    "request",
+    "assertion"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/toomuchdesign/msw-inspector.git"
