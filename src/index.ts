@@ -61,7 +61,7 @@ function createMSWInspector<FunctionMock extends Function>({
      * @param {string} path Path of a network request (`/path`)
      * @return {*} {FunctionMock}
      */
-    getCalls(path: string): FunctionMock {
+    getRequests(path: string): FunctionMock {
       const requestLogEntry = requestLog.get(path);
       if (requestLogEntry) {
         return requestLogEntry;

@@ -19,23 +19,22 @@ afterAll(() => {
   mswInspector.teardown();
 });
 
-describe('getCalls', () => {
+describe('getRequests', () => {
   it('returns a mocked function with mathching intercepted calls for a given path', async () => {
     await fetch('http://absolute.path');
 
-    expect(mswInspector.getCalls('http://absolute.path/')).toHaveBeenCalledWith(
-      {
-        method: 'GET',
-        headers: {
-          accept: '*/*',
-          'accept-encoding': 'gzip,deflate',
-          connection: 'close',
-          host: 'absolute.path',
-          'user-agent':
-            'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
-        },
-      }
-    );
+    expect(
+      mswInspector.getRequestsTo('http://absolute.path/')
+    ).toHaveBeenCalledWith({
+      method: 'GET',
+      headers: {
+        accept: '*/*',
+        'accept-encoding': 'gzip,deflate',
+        connection: 'close',
+        host: 'absolute.path',
+        'user-agent': 'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
+      },
+    });
   });
 
   describe('no matching calls', () => {
@@ -43,7 +42,7 @@ describe('getCalls', () => {
       await fetch('http://absolute.path');
 
       expect(() =>
-        mswInspector.getCalls('http://it.was.never.called/')
+        mswInspector.getRequestsTo('http://it.was.never.called/')
       ).toThrowError(
         '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://absolute.path'
       );
