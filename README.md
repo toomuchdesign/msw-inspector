@@ -1,5 +1,9 @@
 # MSW inspector
 
+[![Build status][ci-badge]][ci]
+[![Npm version][npm-version-badge]][npm]
+[![Test coverage report][coveralls-badge]][coveralls]
+
 Plug-and-play **request assertion** utility for any [`msw`][msw] mock setup, as [highly discouraged][msw-docs-request-assertions] by `msw` authors :)
 
 ## Why?
@@ -105,6 +109,12 @@ type CallPayload = {
 - Consider listening to network layer with [`@mswjs/interceptors`](https://github.com/mswjs/interceptors) and make MSW inspector usable in non-`msw` projects
 - Consider accepting a function to customize requests mapping and payload
 
+[ci-badge]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml/badge.svg
+[ci]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml
+[coveralls-badge]: https://coveralls.io/repos/github/toomuchdesign/msw-inspector/badge.svg?branch=master
+[coveralls]: https://coveralls.io/github/toomuchdesign/msw-inspector?branch=master
+[npm]: https://www.npmjs.com/package/msw-inspector
+[npm-version-badge]: https://img.shields.io/npm/v/msw-inspector.svg
 [msw]: https://mswjs.io
 [msw-docs-life-cycle-events]: https://mswjs.io/docs/extensions/life-cycle-events
 [msw-docs-request-assertions]: https://mswjs.io/docs/recipes/request-assertions
