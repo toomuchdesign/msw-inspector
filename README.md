@@ -78,7 +78,7 @@ Create a `MSW inspector` instance bound to a specific `msw` [SetupServerApi][msw
 ```ts
 import { createMSWInspector } from 'msw-inspector';
 
-createCachedSelector({
+createMSWInspector({
   mockSetup, // Any `msw` SetupServerApi or SetupWorkerApi instance
   mockFactory, // Function returning a mocked function instance to be inspected in your tests
 });
