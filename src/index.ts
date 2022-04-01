@@ -8,7 +8,7 @@ type RequestLogRecord = {
   query?: Record<string, string>;
 };
 
-function requestMapper(req: MockedRequest): {
+function defaultRequestMapper(req: MockedRequest): {
   key: string;
   record: RequestLogRecord;
 } {
@@ -39,9 +39,14 @@ function requestMapper(req: MockedRequest): {
 function createMSWInspector<FunctionMock extends Function>({
   mockSetup,
   mockFactory,
+  requestMapper = defaultRequestMapper,
 }: {
   mockSetup: SetupServerApi | SetupWorkerApi;
   mockFactory: () => FunctionMock;
+  requestMapper?: (req: MockedRequest) => {
+    key: string;
+    record: Record<string, any>;
+  };
 }) {
   // Store network requests by url
   const requestLog = new Map<string, FunctionMock>();

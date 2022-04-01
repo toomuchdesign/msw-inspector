@@ -70,11 +70,11 @@
   },
   "lint-staged": {
     "**/*.{js,json}": [
-      "prettier",
-      "npm t"
+      "npm run prettier",
+      "npm run test:source"
     ],
     "**/*.md": [
-      "prettier"
+      "npm run prettier"
     ]
   },
   "engines": {
