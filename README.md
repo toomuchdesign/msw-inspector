@@ -81,18 +81,40 @@ import { createMSWInspector } from 'msw-inspector';
 createMSWInspector({
   mockSetup, // Any `msw` SetupServerApi or SetupWorkerApi instance
   mockFactory, // Function returning a mocked function instance to be inspected in your tests
+  requestMapper, // Optional mapper function to customize how requests are stored
 });
 ```
 
+#### Options object
+
+`createMSWInspector` accepts the following options object:
+
+```ts
+ {
+  mockSetup: SetupServerApi | SetupWorkerApi;
+  mockFactory: () => FunctionMock;
+  requestMapper?: (req: MockedRequest) => {
+    key: string;
+    record: Record<string, any>;
+  };
+}
+```
+
+| Option                       | Description                                                                                                                                                                         | Default value                                  |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
+| **mockSetup** _(required)_   | The instance of `msw` mocks expected to inspect _([`setupWorker`][msw-docs-setup-worker] or [`setupServer`][msw-docs-setup-server] result)_                                         | -                                              |
+| **mockFactory** _(required)_ | A function returning the function mock preferred by your testing framework: It can be `() => jest.fn()` for Jest, `() => sinon.spy()` for Sinon, `() => vi.fn()` for Vitest, etc... | -                                              |
+| **requestMapper**            | Customize default request's key and record mapping with your own logic.                                                                                                             | See [`defaultRequestMapper`](src/index.ts#L11) |
+
 ### `getRequests`
 
-Returns a mocked function containing all the calls intercepted for the given absolute url:
+Returns a mocked function containing all the calls intercepted at the given absolute url (by default):
 
 ```ts
 mswInspector.getRequests('http://my.url/path');
 ```
 
-Each intercepted request calls the matching mocked function with the following payload:
+Each intercepted request calls the matching mocked function with the following default payload:
 
 ```ts
 type CallPayload = {
