@@ -1,4 +1,3 @@
-import fetch from 'node-fetch';
 import { createMSWInspector } from '../index';
 import { server } from './__mocks__/server';
 
@@ -22,9 +21,12 @@ describe('getRequests', () => {
     });
 
     it('returns a mocked function with matching intercepted calls for a given path', async () => {
-      await fetch('http://absolute.path?name=foo', {
+      await fetch('http://absolute.path?myQueryString=foo', {
         method: 'POST',
-        body: JSON.stringify({ surname: 'bar' }),
+        headers: {
+          myHeader: 'foo',
+        },
+        body: JSON.stringify({ hello: 'world' }),
       });
 
       expect(
@@ -32,18 +34,12 @@ describe('getRequests', () => {
       ).toHaveBeenCalledWith({
         method: 'POST',
         headers: {
-          accept: '*/*',
-          'accept-encoding': 'gzip,deflate',
-          connection: 'close',
-          'content-length': '17',
+          myheader: 'foo',
           'content-type': 'text/plain;charset=UTF-8',
-          host: 'absolute.path',
-          'user-agent':
-            'node-fetch/1.0 (+https://github.com/bitinn/node-fetch)',
         },
-        body: JSON.stringify({ surname: 'bar' }),
+        body: JSON.stringify({ hello: 'world' }),
         query: {
-          name: 'foo',
+          myQueryString: 'foo',
         },
       });
     });

@@ -1,5 +1,5 @@
-import type { MockedRequest, SetupWorkerApi } from 'msw';
-import type { SetupServerApi } from 'msw/node';
+import type { MockedRequest } from 'msw';
+import type { SetupServer } from 'msw/node';
 
 type RequestLogRecord = {
   method: string;
@@ -41,7 +41,7 @@ function createMSWInspector<FunctionMock extends Function>({
   mockFactory,
   requestMapper = defaultRequestMapper,
 }: {
-  mockSetup: SetupServerApi | SetupWorkerApi;
+  mockSetup: SetupServer;
   mockFactory: () => FunctionMock;
   requestMapper?: (req: MockedRequest) => {
     key: string;

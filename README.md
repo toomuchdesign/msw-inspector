@@ -129,7 +129,7 @@ type CallPayload = {
 
 - Consider a better name for `getRequests`
 - Consider listening to network layer with [`@mswjs/interceptors`](https://github.com/mswjs/interceptors) and make MSW inspector usable in non-`msw` projects
-- Consider accepting a function to customize requests mapping and payload
+- Drop `req.body` for relevant async methods
 
 [ci-badge]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml/badge.svg
 [ci]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml
