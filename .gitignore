@@ -18,3 +18,4 @@ coverage
 !.prettierrc
 !.travis.yml
 !.github
+!.nvmrc
