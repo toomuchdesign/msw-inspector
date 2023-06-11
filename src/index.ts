@@ -4,15 +4,15 @@ import type { SetupServer } from 'msw/node';
 type RequestLogRecord = {
   method: string;
   headers: Record<string, string>;
-  body?: MockedRequest['body'];
+  body?: any;
   query?: Record<string, string>;
 };
 
-function defaultRequestMapper(req: MockedRequest): {
+async function defaultRequestMapper(req: MockedRequest): Promise<{
   key: string;
   record: RequestLogRecord;
-} {
-  const { method, headers, body } = req;
+}> {
+  const { method, headers } = req;
   const { protocol, host, pathname, searchParams } = req.url;
 
   // @TODO review key generation
@@ -21,6 +21,16 @@ function defaultRequestMapper(req: MockedRequest): {
     Array.from(searchParams.keys()).length > 0
       ? Object.fromEntries(searchParams)
       : undefined;
+
+  const bodyAsText = await req.text();
+  let body;
+
+  // A rough attempt to support both text and json bodies
+  try {
+    body = JSON.parse(bodyAsText);
+  } catch (err) {
+    body = bodyAsText;
+  }
 
   return {
     key,
@@ -43,16 +53,16 @@ function createMSWInspector<FunctionMock extends Function>({
 }: {
   mockSetup: SetupServer;
   mockFactory: () => FunctionMock;
-  requestMapper?: (req: MockedRequest) => {
+  requestMapper?: (req: MockedRequest) => Promise<{
     key: string;
     record: Record<string, any>;
-  };
+  }>;
 }) {
   // Store network requests by url
   const requestLog = new Map<string, FunctionMock>();
 
-  function logRequest(req: MockedRequest): void {
-    const { key, record } = requestMapper(req);
+  async function logRequest(req: MockedRequest): Promise<void> {
+    const { key, record } = await requestMapper(req);
 
     // Create an inspectionable request log and store it in requestLog map
     // Create a new request log entry (a function mock of any testing framework) for current url, if necessary

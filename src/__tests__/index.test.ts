@@ -2,31 +2,38 @@ import { createMSWInspector } from '../index';
 import { server } from './__mocks__/server';
 
 describe('getRequests', () => {
-  describe('default options', () => {
-    const mswInspector = createMSWInspector({
-      mockSetup: server,
-      mockFactory: () => jest.fn(),
-    });
+  const mswInspector = createMSWInspector({
+    mockSetup: server,
+    mockFactory: () => jest.fn(),
+  });
 
-    beforeAll(() => {
-      mswInspector.setup();
-    });
+  beforeAll(() => {
+    mswInspector.setup();
+  });
 
-    beforeEach(() => {
-      mswInspector.clear();
-    });
+  beforeEach(() => {
+    mswInspector.clear();
+  });
 
-    afterAll(() => {
-      mswInspector.teardown();
-    });
+  afterAll(() => {
+    mswInspector.teardown();
+  });
 
+  describe.each([
+    {
+      body: JSON.stringify({ hello: 'world' }),
+      expectedBody: { hello: 'world' },
+      type: 'json',
+    },
+    { body: 'Plain text', expectedBody: 'Plain text', type: 'text' },
+  ])('body as $type', ({ body, expectedBody, type }) => {
     it('returns a mocked function with matching intercepted calls for a given path', async () => {
       await fetch('http://absolute.path?myQueryString=foo', {
         method: 'POST',
         headers: {
           myHeader: 'foo',
         },
-        body: JSON.stringify({ hello: 'world' }),
+        body,
       });
 
       expect(
@@ -37,23 +44,23 @@ describe('getRequests', () => {
           myheader: 'foo',
           'content-type': 'text/plain;charset=UTF-8',
         },
-        body: JSON.stringify({ hello: 'world' }),
+        body: expectedBody,
         query: {
           myQueryString: 'foo',
         },
       });
     });
+  });
 
-    describe('no matching calls', () => {
-      it('throw expected error', async () => {
-        await fetch('http://absolute.path');
+  describe('no matching calls', () => {
+    it('throw expected error', async () => {
+      await fetch('http://absolute.path');
 
-        expect(() =>
-          mswInspector.getRequests('http://it.was.never.called/')
-        ).toThrowError(
-          '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://absolute.path'
-        );
-      });
+      expect(() =>
+        mswInspector.getRequests('http://it.was.never.called/')
+      ).toThrowError(
+        '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://absolute.path'
+      );
     });
   });
 
@@ -61,7 +68,7 @@ describe('getRequests', () => {
     const mswInspector = createMSWInspector({
       mockSetup: server,
       mockFactory: () => jest.fn(),
-      requestMapper: (req) => {
+      requestMapper: async (req) => {
         const { method } = req;
         const { pathname } = req.url;
 

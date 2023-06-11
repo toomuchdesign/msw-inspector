@@ -93,10 +93,10 @@ createMSWInspector({
  {
   mockSetup: SetupServerApi | SetupWorkerApi;
   mockFactory: () => FunctionMock;
-  requestMapper?: (req: MockedRequest) => {
+  requestMapper?: (req: MockedRequest) => Promise<{
     key: string;
     record: Record<string, any>;
-  };
+  }>;
 }
 ```
 
@@ -104,7 +104,7 @@ createMSWInspector({
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
 | **mockSetup** _(required)_   | The instance of `msw` mocks expected to inspect _([`setupWorker`][msw-docs-setup-worker] or [`setupServer`][msw-docs-setup-server] result)_                                         | -                                              |
 | **mockFactory** _(required)_ | A function returning the function mock preferred by your testing framework: It can be `() => jest.fn()` for Jest, `() => sinon.spy()` for Sinon, `() => vi.fn()` for Vitest, etc... | -                                              |
-| **requestMapper**            | Customize default request's key and record mapping with your own logic.                                                                                                             | See [`defaultRequestMapper`](src/index.ts#L11) |
+| **requestMapper**            | Customize default request's key and record mapping with your own logic. Async function.                                                                                             | See [`defaultRequestMapper`](src/index.ts#L11) |
 
 ### `getRequests`
 
@@ -129,7 +129,6 @@ type CallPayload = {
 
 - Consider a better name for `getRequests`
 - Consider listening to network layer with [`@mswjs/interceptors`](https://github.com/mswjs/interceptors) and make MSW inspector usable in non-`msw` projects
-- Drop `req.body` for relevant async methods
 
 [ci-badge]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml/badge.svg
 [ci]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml
