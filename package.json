@@ -39,7 +39,7 @@
     "@types/jest": "^27.4.1",
     "@types/node-fetch": "^2.6.1",
     "jest": "^27.5.1",
-    "msw": "^0.39.2",
+    "msw": "^1.2.2",
     "node-fetch": "^2.6.7",
     "prettier": "^2.0.0",
     "simple-git-hooks": "^2.0.0",
