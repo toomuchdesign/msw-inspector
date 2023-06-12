@@ -73,13 +73,13 @@ describe('My test', () => {
 
 ### `createMSWInspector`
 
-Create a `MSW inspector` instance bound to a specific `msw` [SetupServerApi][msw-docs-setup-server] or [SetupWorkerApi][msw-docs-setup-worker] instance:
+Create a `MSW inspector` instance bound to a specific `msw` [SetupServer][msw-docs-setup-server] or [SetupWorker][msw-docs-setup-worker] instance:
 
 ```ts
 import { createMSWInspector } from 'msw-inspector';
 
 createMSWInspector({
-  mockSetup, // Any `msw` SetupServerApi or SetupWorkerApi instance
+  mockSetup, // Any `msw` SetupServer or SetupWorker instance
   mockFactory, // Function returning a mocked function instance to be inspected in your tests
   requestMapper, // Optional mapper function to customize how requests are stored
 });
@@ -91,12 +91,12 @@ createMSWInspector({
 
 ```ts
  {
-  mockSetup: SetupServerApi | SetupWorkerApi;
+  mockSetup: SetupServer | SetupWorker;
   mockFactory: () => FunctionMock;
-  requestMapper?: (req: MockedRequest) => {
+  requestMapper?: (req: MockedRequest) => Promise<{
     key: string;
     record: Record<string, any>;
-  };
+  }>;
 }
 ```
 
@@ -104,7 +104,7 @@ createMSWInspector({
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
 | **mockSetup** _(required)_   | The instance of `msw` mocks expected to inspect _([`setupWorker`][msw-docs-setup-worker] or [`setupServer`][msw-docs-setup-server] result)_                                         | -                                              |
 | **mockFactory** _(required)_ | A function returning the function mock preferred by your testing framework: It can be `() => jest.fn()` for Jest, `() => sinon.spy()` for Sinon, `() => vi.fn()` for Vitest, etc... | -                                              |
-| **requestMapper**            | Customize default request's key and record mapping with your own logic.                                                                                                             | See [`defaultRequestMapper`](src/index.ts#L11) |
+| **requestMapper**            | Customize default request's key and record mapping with your own logic. Async function.                                                                                             | See [`defaultRequestMapper`](src/index.ts#L11) |
 
 ### `getRequests`
 
@@ -129,7 +129,7 @@ type CallPayload = {
 
 - Consider a better name for `getRequests`
 - Consider listening to network layer with [`@mswjs/interceptors`](https://github.com/mswjs/interceptors) and make MSW inspector usable in non-`msw` projects
-- Consider accepting a function to customize requests mapping and payload
+- Todo find out why `SetupServer | SetupWorker` union causes a type error in lifecycle events
 
 [ci-badge]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml/badge.svg
 [ci]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml
