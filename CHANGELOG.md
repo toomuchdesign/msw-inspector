@@ -1,3 +1,9 @@
+# 1.0.0
+
+### Breaking change
+
+- Support `msw` v1+
+
 # 0.1.0
 
 ### New Features
