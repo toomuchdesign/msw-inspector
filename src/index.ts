@@ -1,4 +1,4 @@
-import type { MockedRequest } from 'msw';
+import type { MockedRequest, SetupWorker } from 'msw';
 import type { SetupServer } from 'msw/node';
 
 type RequestLogRecord = {
@@ -51,7 +51,7 @@ function createMSWInspector<FunctionMock extends Function>({
   mockFactory,
   requestMapper = defaultRequestMapper,
 }: {
-  mockSetup: SetupServer;
+  mockSetup: SetupServer | SetupWorker;
   mockFactory: () => FunctionMock;
   requestMapper?: (req: MockedRequest) => Promise<{
     key: string;
@@ -105,6 +105,7 @@ function createMSWInspector<FunctionMock extends Function>({
      */
     setup() {
       // https://mswjs.io/docs/extensions/life-cycle-events#methods
+      //@ts-expect-error type check seems to fail because of  SetupServer | SetupWorker union
       mockSetup.events.on('request:start', logRequest);
     },
 
@@ -119,6 +120,7 @@ function createMSWInspector<FunctionMock extends Function>({
      * Tear down msw spy. Call it after all tests are executed
      */
     teardown() {
+      //@ts-expect-error type check seems to fail because of  SetupServer | SetupWorker union
       mockSetup.events.removeListener('request:start', logRequest);
     },
   };
