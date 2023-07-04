@@ -22,13 +22,20 @@ MSW inspector provides a thin layer of logic over [msw life-cycle events][msw-do
 
 Each request is saved as a **function mock call** retrievable by URL. This allows elegant assertions against request information like `method`, `headers`, `body`, `query`.
 
+## Installation
+
+```
+npm install msw-inspector -D
+```
+
 ## Example
 
 This example uses Jest, but MSW inspector integrates with **any testing framework**.
 
 ```js
+import { jest } from '@jest/globals';
 import { createMSWInspector } from 'msw-inspector';
-import { server } from '@/mocks/server';
+import { server } from './your-msw-server';
 
 const mswInspector = createMSWInspector({
   mockSetup: server,
