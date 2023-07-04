@@ -28,13 +28,22 @@ describe('getRequests', () => {
     { body: 'Plain text', expectedBody: 'Plain text', type: 'text' },
   ])('body as $type', ({ body, expectedBody, type }) => {
     it('returns a mocked function with matching intercepted calls for a given path', async () => {
-      await fetch('http://absolute.path?myQueryString=foo', {
-        method: 'POST',
-        headers: {
-          myHeader: 'foo',
-        },
-        body,
-      });
+      const queryString = {
+        string: 'string=value',
+        array: 'array[]=value1&array[]=value2',
+        object: 'object[prop1]=value1&object[prop2]=value2',
+      };
+
+      await fetch(
+        `http://absolute.path?${queryString.string}&${queryString.array}&${queryString.object}`,
+        {
+          method: 'POST',
+          headers: {
+            myHeader: 'foo',
+          },
+          body,
+        }
+      );
 
       expect(
         mswInspector.getRequests('http://absolute.path/')
@@ -46,7 +55,12 @@ describe('getRequests', () => {
         },
         body: expectedBody,
         query: {
-          myQueryString: 'foo',
+          string: 'value',
+          array: ['value1', 'value2'],
+          object: {
+            prop1: 'value1',
+            prop2: 'value2',
+          },
         },
       });
     });
