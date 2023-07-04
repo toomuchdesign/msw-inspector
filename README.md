@@ -56,7 +56,7 @@ afterAll(() => {
 
 describe('My test', () => {
   it('My test', async () => {
-    // Perform your test preparation
+    // Perform your tests
 
     expect(mswInspector.getRequests('http://my.url/path')).toHaveBeenCalledWith(
       {
@@ -107,11 +107,11 @@ createMSWInspector({
 }
 ```
 
-| Option                       | Description                                                                                                                                                                         | Default value                                  |
-| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------- |
-| **mockSetup** _(required)_   | The instance of `msw` mocks expected to inspect _([`setupWorker`][msw-docs-setup-worker] or [`setupServer`][msw-docs-setup-server] result)_                                         | -                                              |
-| **mockFactory** _(required)_ | A function returning the function mock preferred by your testing framework: It can be `() => jest.fn()` for Jest, `() => sinon.spy()` for Sinon, `() => vi.fn()` for Vitest, etc... | -                                              |
-| **requestMapper**            | Customize default request's key and record mapping with your own logic. Async function.                                                                                             | See [`defaultRequestMapper`](src/index.ts#L11) |
+| Option                       | Description                                                                                                                                                                         | Default value                           |
+| ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
+| **mockSetup** _(required)_   | The instance of `msw` mocks expected to inspect _([`setupWorker`][msw-docs-setup-worker] or [`setupServer`][msw-docs-setup-server] result)_                                         | -                                       |
+| **mockFactory** _(required)_ | A function returning the function mock preferred by your testing framework: It can be `() => jest.fn()` for Jest, `() => sinon.spy()` for Sinon, `() => vi.fn()` for Vitest, etc... | -                                       |
+| **requestMapper**            | Customize default request's key and record mapping with your own logic. Async function.                                                                                             | See [`requestMapper`](src/index.ts#L54) |
 
 ### `getRequests`
 
@@ -121,7 +121,7 @@ Returns a mocked function containing all the calls intercepted at the given abso
 mswInspector.getRequests('http://my.url/path');
 ```
 
-Each intercepted request calls the matching mocked function with the following default payload:
+By default each intercepted request calls the matching mocked function with the following default payload:
 
 ```ts
 type CallPayload = {

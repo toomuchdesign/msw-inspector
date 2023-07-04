@@ -47,11 +47,15 @@ async function defaultRequestMapper(req: MockedRequest): Promise<{
 function createMSWInspector<FunctionMock extends Function>({
   mockSetup,
   mockFactory,
-  requestMapper = defaultRequestMapper,
+  requestMapper = async ({ key, record }) => ({ key, record }),
 }: {
   mockSetup: SetupServer | SetupWorker;
   mockFactory: () => FunctionMock;
-  requestMapper?: (req: MockedRequest) => Promise<{
+  requestMapper?: (input: {
+    req: MockedRequest;
+    key: string;
+    record: RequestLogRecord;
+  }) => Promise<{
     key: string;
     record: Record<string, any>;
   }>;
@@ -60,11 +64,12 @@ function createMSWInspector<FunctionMock extends Function>({
   const requestLog = new Map<string, FunctionMock>();
 
   async function logRequest(req: MockedRequest): Promise<void> {
-    const { key, record } = await requestMapper(req);
+    const defaultMapping = await defaultRequestMapper(req);
+    const { key, record } = await requestMapper({ req, ...defaultMapping });
 
-    // Create an inspectionable request log and store it in requestLog map
-    // Create a new request log entry (a function mock of any testing framework) for current url, if necessary
     if (!requestLog.has(key)) {
+      // Create an inspectionable request log and store it in requestLog map
+      // Create a new request log entry (a function mock of any testing framework) for current url, if necessary
       const newRequestLogEntry = mockFactory();
       requestLog.set(key, newRequestLogEntry);
     }

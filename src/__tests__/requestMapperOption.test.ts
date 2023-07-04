@@ -4,14 +4,16 @@ import { server } from './__mocks__/server';
 const mswInspector: MswInspector = createMSWInspector({
   mockSetup: server,
   mockFactory: () => jest.fn(),
-  requestMapper: async (req) => {
+  requestMapper: async ({ req, record, key }) => {
     const { method } = req;
     const { pathname } = req.url;
+    const { body } = record;
 
     return {
       key: pathname,
       record: {
         method,
+        customBodyProp: body,
       },
     };
   },
@@ -38,6 +40,7 @@ describe('requestMapper option', () => {
 
     expect(mswInspector.getRequests('/path-name')).toHaveBeenCalledWith({
       method: 'POST',
+      customBodyProp: { surname: 'bar' },
     });
   });
 });
