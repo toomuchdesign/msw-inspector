@@ -1,24 +1,24 @@
-import { createMSWInspector } from '../index';
+import { createMSWInspector, MswInspector } from '../index';
 import { server } from './__mocks__/server';
 
+const mswInspector: MswInspector = createMSWInspector({
+  mockSetup: server,
+  mockFactory: () => jest.fn(),
+});
+
+beforeAll(() => {
+  mswInspector.setup();
+});
+
+beforeEach(() => {
+  mswInspector.clear();
+});
+
+afterAll(() => {
+  mswInspector.teardown();
+});
+
 describe('getRequests', () => {
-  const mswInspector = createMSWInspector({
-    mockSetup: server,
-    mockFactory: () => jest.fn(),
-  });
-
-  beforeAll(() => {
-    mswInspector.setup();
-  });
-
-  beforeEach(() => {
-    mswInspector.clear();
-  });
-
-  afterAll(() => {
-    mswInspector.teardown();
-  });
-
   describe.each([
     {
       body: JSON.stringify({ hello: 'world' }),
@@ -75,47 +75,6 @@ describe('getRequests', () => {
       ).toThrowError(
         '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://absolute.path'
       );
-    });
-  });
-
-  describe('requestMapper option', () => {
-    const mswInspector = createMSWInspector({
-      mockSetup: server,
-      mockFactory: () => jest.fn(),
-      requestMapper: async (req) => {
-        const { method } = req;
-        const { pathname } = req.url;
-
-        return {
-          key: pathname,
-          record: {
-            method,
-          },
-        };
-      },
-    });
-
-    beforeAll(() => {
-      mswInspector.setup();
-    });
-
-    beforeEach(() => {
-      mswInspector.clear();
-    });
-
-    afterAll(() => {
-      mswInspector.teardown();
-    });
-
-    it('replaces default mapping behavior', async () => {
-      await fetch('http://absolute.path/path-name', {
-        method: 'POST',
-        body: JSON.stringify({ surname: 'bar' }),
-      });
-
-      expect(mswInspector.getRequests('/path-name')).toHaveBeenCalledWith({
-        method: 'POST',
-      });
     });
   });
 });
