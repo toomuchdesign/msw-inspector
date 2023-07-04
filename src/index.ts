@@ -1,5 +1,6 @@
 import type { MockedRequest, SetupWorker } from 'msw';
 import type { SetupServer } from 'msw/node';
+import qs from 'qs';
 
 type RequestLogRecord = {
   method: string;
@@ -13,14 +14,11 @@ async function defaultRequestMapper(req: MockedRequest): Promise<{
   record: RequestLogRecord;
 }> {
   const { method, headers } = req;
-  const { protocol, host, pathname, searchParams } = req.url;
+  const { protocol, host, pathname, search } = req.url;
 
   // @TODO review key generation
   const key = protocol + '//' + host + pathname;
-  const query =
-    Array.from(searchParams.keys()).length > 0
-      ? Object.fromEntries(searchParams)
-      : undefined;
+  const query = search ? qs.parse(search.substring(1)) : undefined;
 
   const bodyAsText = await req.text();
   let body;
