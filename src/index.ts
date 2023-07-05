@@ -1,45 +1,6 @@
 import type { MockedRequest, SetupWorker } from 'msw';
 import type { SetupServer } from 'msw/node';
-import qs from 'qs';
-
-type RequestLogRecord = {
-  method: string;
-  headers: Record<string, string>;
-  body?: any;
-  query?: Record<string, string>;
-};
-
-async function defaultRequestMapper(req: MockedRequest): Promise<{
-  key: string;
-  record: RequestLogRecord;
-}> {
-  const { method, headers } = req;
-  const { protocol, host, pathname, search } = req.url;
-
-  // @TODO review key generation
-  const key = protocol + '//' + host + pathname;
-  const query = search ? qs.parse(search.substring(1)) : undefined;
-
-  const bodyAsText = await req.text();
-  let body;
-
-  // A rough attempt to support both text and json bodies
-  try {
-    body = JSON.parse(bodyAsText);
-  } catch (err) {
-    body = bodyAsText;
-  }
-
-  return {
-    key,
-    record: {
-      method,
-      headers: headers.all(),
-      ...(body && { body }),
-      ...(query && { query }),
-    },
-  };
-}
+import { defaultRequestMapper } from './defaultRequestMapper';
 
 /**
  * Create a new MSW inspector instance bound to the provided msw server setup
@@ -62,9 +23,9 @@ function createMSWInspector<FunctionMock extends Function>({
   async function logRequest(req: MockedRequest): Promise<void> {
     const { key, record } = await requestMapper(req);
 
-    // Create an inspectionable request log and store it in requestLog map
-    // Create a new request log entry (a function mock of any testing framework) for current url, if necessary
     if (!requestLog.has(key)) {
+      // Create an inspectionable request log and store it in requestLog map
+      // Create a new request log entry (a function mock of any testing framework) for current url, if necessary
       const newRequestLogEntry = mockFactory();
       requestLog.set(key, newRequestLogEntry);
     }
@@ -105,6 +66,7 @@ function createMSWInspector<FunctionMock extends Function>({
       // https://mswjs.io/docs/extensions/life-cycle-events#methods
       //@ts-expect-error type check seems to fail because of  SetupServer | SetupWorker union
       mockSetup.events.on('request:start', logRequest);
+      return this;
     },
 
     /**
@@ -112,6 +74,7 @@ function createMSWInspector<FunctionMock extends Function>({
      */
     clear() {
       requestLog.clear();
+      return this;
     },
 
     /**
@@ -120,8 +83,10 @@ function createMSWInspector<FunctionMock extends Function>({
     teardown() {
       //@ts-expect-error type check seems to fail because of  SetupServer | SetupWorker union
       mockSetup.events.removeListener('request:start', logRequest);
+      return this;
     },
   };
 }
 
-export { createMSWInspector };
+export type MswInspector = ReturnType<typeof createMSWInspector>;
+export { createMSWInspector, defaultRequestMapper };
