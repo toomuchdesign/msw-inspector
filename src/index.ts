@@ -1,45 +1,6 @@
 import type { MockedRequest, SetupWorker } from 'msw';
 import type { SetupServer } from 'msw/node';
-import qs from 'qs';
-
-type RequestLogRecord = {
-  method: string;
-  headers: Record<string, string>;
-  body?: any;
-  query?: Record<string, string>;
-};
-
-async function defaultRequestMapper(req: MockedRequest): Promise<{
-  key: string;
-  record: RequestLogRecord;
-}> {
-  const { method, headers } = req;
-  const { protocol, host, pathname, search } = req.url;
-
-  // @TODO review key generation
-  const key = protocol + '//' + host + pathname;
-  const query = search ? qs.parse(search.substring(1)) : undefined;
-
-  const bodyAsText = await req.text();
-  let body;
-
-  // A rough attempt to support both text and json bodies
-  try {
-    body = JSON.parse(bodyAsText);
-  } catch (err) {
-    body = bodyAsText;
-  }
-
-  return {
-    key,
-    record: {
-      method,
-      headers: headers.all(),
-      ...(body && { body }),
-      ...(query && { query }),
-    },
-  };
-}
+import { defaultRequestMapper } from './defaultRequestMapper';
 
 /**
  * Create a new MSW inspector instance bound to the provided msw server setup
@@ -47,15 +8,11 @@ async function defaultRequestMapper(req: MockedRequest): Promise<{
 function createMSWInspector<FunctionMock extends Function>({
   mockSetup,
   mockFactory,
-  requestMapper = async ({ key, record }) => ({ key, record }),
+  requestMapper = defaultRequestMapper,
 }: {
   mockSetup: SetupServer | SetupWorker;
   mockFactory: () => FunctionMock;
-  requestMapper?: (input: {
-    req: MockedRequest;
-    key: string;
-    record: RequestLogRecord;
-  }) => Promise<{
+  requestMapper?: (req: MockedRequest) => Promise<{
     key: string;
     record: Record<string, any>;
   }>;
@@ -64,8 +21,7 @@ function createMSWInspector<FunctionMock extends Function>({
   const requestLog = new Map<string, FunctionMock>();
 
   async function logRequest(req: MockedRequest): Promise<void> {
-    const defaultMapping = await defaultRequestMapper(req);
-    const { key, record } = await requestMapper({ req, ...defaultMapping });
+    const { key, record } = await requestMapper(req);
 
     if (!requestLog.has(key)) {
       // Create an inspectionable request log and store it in requestLog map
@@ -133,4 +89,4 @@ function createMSWInspector<FunctionMock extends Function>({
 }
 
 export type MswInspector = ReturnType<typeof createMSWInspector>;
-export { createMSWInspector };
+export { createMSWInspector, defaultRequestMapper };

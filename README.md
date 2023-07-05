@@ -111,7 +111,7 @@ createMSWInspector({
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
 | **mockSetup** _(required)_   | The instance of `msw` mocks expected to inspect _([`setupWorker`][msw-docs-setup-worker] or [`setupServer`][msw-docs-setup-server] result)_                                         | -                                       |
 | **mockFactory** _(required)_ | A function returning the function mock preferred by your testing framework: It can be `() => jest.fn()` for Jest, `() => sinon.spy()` for Sinon, `() => vi.fn()` for Vitest, etc... | -                                       |
-| **requestMapper**            | Customize default request's key and record mapping with your own logic. Async function.                                                                                             | See [`requestMapper`](src/index.ts#L54) |
+| **requestMapper**            | Customize default request's key and record mapping with your own logic. Async function.                                                                                             | See [`requestMapper`](src/index.ts#L15) |
 
 ### `getRequests`
 
@@ -121,15 +121,36 @@ Returns a mocked function containing all the calls intercepted at the given abso
 mswInspector.getRequests('http://my.url/path');
 ```
 
-By default each intercepted request calls the matching mocked function with the following default payload:
+By default each intercepted request calls the matching mocked function with the following request log record:
 
 ```ts
-type CallPayload = {
+type DefaultRequestLogRecord = {
   method: string;
   headers: Record<string, string>;
   body?: any;
   query?: Record<string, string>;
 };
+```
+
+If you want to create a different log record you can do so by providing a custom `requestMapper`:
+
+```ts
+import { createMSWInspector, defaultRequestMapper } from 'msw-inspector';
+
+const mswInspector = createMSWInspector({
+  requestMapper: async (req) => {
+    // Optionally use the default request mapper to get the default request object
+    const defaultLog = await defaultRequestMapper(req);
+
+    return {
+      key: pathname,
+      record: {
+        myMethodProp: req.method,
+        myBodyProp: defaultLog.record.body,
+      },
+    };
+  },
+});
 ```
 
 ## Todo

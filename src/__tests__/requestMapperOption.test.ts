@@ -1,13 +1,19 @@
-import { createMSWInspector, MswInspector } from '../index';
+import {
+  createMSWInspector,
+  defaultRequestMapper,
+  MswInspector,
+} from '../index';
 import { server } from './__mocks__/server';
 
 const mswInspector: MswInspector = createMSWInspector({
   mockSetup: server,
   mockFactory: () => jest.fn(),
-  requestMapper: async ({ req, record, key }) => {
+  requestMapper: async (req) => {
     const { method } = req;
     const { pathname } = req.url;
-    const { body } = record;
+    const {
+      record: { body },
+    } = await defaultRequestMapper(req);
 
     return {
       key: pathname,
