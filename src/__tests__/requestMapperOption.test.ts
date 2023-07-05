@@ -10,17 +10,11 @@ const mswInspector: MswInspector = createMSWInspector({
   mockFactory: () => jest.fn(),
   requestMapper: async (req) => {
     const { method } = req;
-    const { pathname } = req.url;
-    const {
-      record: { body },
-    } = await defaultRequestMapper(req);
+    const { body } = await defaultRequestMapper(req);
 
     return {
-      key: pathname,
-      record: {
-        method,
-        customBodyProp: body,
-      },
+      method,
+      customBodyProp: body,
     };
   },
 });
@@ -39,12 +33,14 @@ afterAll(() => {
 
 describe('requestMapper option', () => {
   it('replaces default mapping behavior', async () => {
-    await fetch('http://absolute.path/path-name', {
+    await fetch('http://origin.com/path/param', {
       method: 'POST',
       body: JSON.stringify({ surname: 'bar' }),
     });
 
-    expect(mswInspector.getRequests('/path-name')).toHaveBeenCalledWith({
+    expect(
+      await mswInspector.getRequests('http://origin.com/path/param'),
+    ).toHaveBeenCalledWith({
       method: 'POST',
       customBodyProp: { surname: 'bar' },
     });

@@ -72,6 +72,7 @@
     "node": ">=v16.0.0"
   },
   "dependencies": {
+    "path-to-regexp": "^6.2.1",
     "qs": "^6.11.2"
   }
 }

@@ -1,17 +1,16 @@
-import qs from 'qs';
+import qs, { ParsedQs } from 'qs';
 import type { MockedRequest } from 'msw';
 
 export type DefaultRequestLogRecord = {
   method: string;
   headers: Record<string, string>;
   body?: any;
-  query?: Record<string, string>;
+  query?: ParsedQs;
 };
 
-export async function defaultRequestMapper(req: MockedRequest): Promise<{
-  key: string;
-  record: DefaultRequestLogRecord;
-}> {
+export async function defaultRequestMapper(
+  req: MockedRequest,
+): Promise<DefaultRequestLogRecord> {
   const { method, headers } = req;
   const { protocol, host, pathname, search } = req.url;
 
@@ -30,12 +29,9 @@ export async function defaultRequestMapper(req: MockedRequest): Promise<{
   }
 
   return {
-    key,
-    record: {
-      method,
-      headers: headers.all(),
-      ...(body && { body }),
-      ...(query && { query }),
-    },
+    method,
+    headers: headers.all() || undefined,
+    ...(body && { body }),
+    ...(query && { query }),
   };
 }

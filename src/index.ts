@@ -1,6 +1,10 @@
 import type { MockedRequest, SetupWorker } from 'msw';
 import type { SetupServer } from 'msw/node';
+import { pathToRegexp } from 'path-to-regexp';
 import { defaultRequestMapper } from './defaultRequestMapper';
+import { makeErrorMessage } from './makeErrorMessage';
+
+type RequestLog = { req: MockedRequest; record: Record<string, unknown> };
 
 /**
  * Create a new MSW inspector instance bound to the provided msw server setup
@@ -12,29 +16,17 @@ function createMSWInspector<FunctionMock extends Function>({
 }: {
   mockSetup: SetupServer | SetupWorker;
   mockFactory: () => FunctionMock;
-  requestMapper?: (req: MockedRequest) => Promise<{
-    key: string;
-    record: Record<string, any>;
-  }>;
+  requestMapper?: (req: MockedRequest) => Promise<Record<string, any>>;
 }) {
   // Store network requests by url
-  const requestLog = new Map<string, FunctionMock>();
+  const requestLog = new Map<string, RequestLog[]>();
 
   async function logRequest(req: MockedRequest): Promise<void> {
-    const { key, record } = await requestMapper(req);
-
-    if (!requestLog.has(key)) {
-      // Create an inspectionable request log and store it in requestLog map
-      // Create a new request log entry (a function mock of any testing framework) for current url, if necessary
-      const newRequestLogEntry = mockFactory();
-      requestLog.set(key, newRequestLogEntry);
-    }
-
-    const requestLogEntry = requestLog.get(key);
-    if (requestLogEntry) {
-      // Here we call function mock on order for tests to inspect it
-      requestLogEntry(record);
-    }
+    const { href } = req.url;
+    const reqs = requestLog.get(href) || [];
+    // @NOTE we need to create the request record now since we can deserialize body only once
+    reqs.push({ req, record: await requestMapper(req) });
+    requestLog.set(href, reqs);
   }
 
   return {
@@ -45,18 +37,46 @@ function createMSWInspector<FunctionMock extends Function>({
      * @param {string} path Path of a network request (`/path`)
      * @return {*} {FunctionMock}
      */
-    getRequests(path: string): FunctionMock {
-      const requestLogEntry = requestLog.get(path);
-      if (requestLogEntry) {
-        return requestLogEntry;
+    async getRequests(path: string): Promise<FunctionMock> {
+      const matches: RequestLog[] = [];
+      requestLog.forEach((requests, requestHref) => {
+        const requestsURL = new URL(requestHref);
+        let pathURL: URL;
+        try {
+          pathURL = new URL(path);
+        } catch (error) {
+          throw new Error(
+            makeErrorMessage({
+              message: `Provided path is invalid: ${path}`,
+              requestLog,
+            }),
+          );
+        }
+
+        if (pathURL.origin !== requestsURL.origin) {
+          return;
+        }
+
+        const regexp = pathToRegexp(pathURL.pathname);
+        if (regexp.exec(requestsURL.pathname)) {
+          matches.push(...requests);
+        }
+      });
+
+      if (matches.length === 0) {
+        throw new Error(
+          makeErrorMessage({
+            message: `Cannot find a matching requests for path: ${path}`,
+            requestLog,
+          }),
+        );
       }
 
-      const availablePaths = Array.from(requestLog.keys());
-      throw new Error(
-        `[msw-inspector] Cannot find a matching requests for path: ${path}. Intercepted requests paths are:\n\n${availablePaths.join(
-          '\n',
-        )}`,
-      );
+      const functionMock = mockFactory();
+      for (const { record } of matches) {
+        functionMock(record);
+      }
+      return functionMock;
     },
 
     /**
