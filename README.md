@@ -100,10 +100,7 @@ createMSWInspector({
  {
   mockSetup: SetupServer | SetupWorker;
   mockFactory: () => FunctionMock;
-  requestMapper?: (req: MockedRequest) => Promise<{
-    key: string;
-    record: Record<string, any>;
-  }>;
+  requestMapper?: (req: MockedRequest) => Promise<Record<string, unknown>>;
 }
 ```
 
@@ -111,14 +108,14 @@ createMSWInspector({
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
 | **mockSetup** _(required)_   | The instance of `msw` mocks expected to inspect _([`setupWorker`][msw-docs-setup-worker] or [`setupServer`][msw-docs-setup-server] result)_                                         | -                                       |
 | **mockFactory** _(required)_ | A function returning the function mock preferred by your testing framework: It can be `() => jest.fn()` for Jest, `() => sinon.spy()` for Sinon, `() => vi.fn()` for Vitest, etc... | -                                       |
-| **requestMapper**            | Customize default request's key and record mapping with your own logic. Async function.                                                                                             | See [`requestMapper`](src/index.ts#L15) |
+| **requestMapper**            | Customize default request's key and record mapping with your own logic. Async function.                                                                                             | See [`requestMapper`](src/index.ts#L19) |
 
 ### `getRequests`
 
-Returns a mocked function containing all the calls intercepted at the given absolute url (by default):
+Returns a mocked function containing all the calls intercepted at the provided absolute url:
 
 ```ts
-mswInspector.getRequests('http://my.url/path');
+mswInspector.getRequests('http://my.url/path/:param');
 ```
 
 By default each intercepted request calls the matching mocked function with the following request log record:
@@ -143,11 +140,8 @@ const mswInspector = createMSWInspector({
     const defaultLog = await defaultRequestMapper(req);
 
     return {
-      key: pathname,
-      record: {
-        myMethodProp: req.method,
-        myBodyProp: defaultLog.record.body,
-      },
+      myMethodProp: req.method,
+      myBodyProp: defaultLog.body,
     };
   },
 });

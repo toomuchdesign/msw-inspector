@@ -16,7 +16,7 @@ function createMSWInspector<FunctionMock extends Function>({
 }: {
   mockSetup: SetupServer | SetupWorker;
   mockFactory: () => FunctionMock;
-  requestMapper?: (req: MockedRequest) => Promise<Record<string, any>>;
+  requestMapper?: (req: MockedRequest) => Promise<Record<string, unknown>>;
 }) {
   // Store network requests by url
   const requestLog = new Map<string, RequestLog[]>();
