@@ -118,6 +118,8 @@ Returns a mocked function containing all the calls intercepted at the provided a
 mswInspector.getRequests('http://my.url/path/:param');
 ```
 
+The matching url can be described flexibly by optionally using [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) syntax.
+
 By default each intercepted request calls the matching mocked function with the following request log record:
 
 ```ts

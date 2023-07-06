@@ -30,7 +30,7 @@ export async function defaultRequestMapper(
 
   return {
     method,
-    headers: headers.all() || undefined,
+    headers: headers.all(),
     ...(body && { body }),
     ...(query && { query }),
   };
