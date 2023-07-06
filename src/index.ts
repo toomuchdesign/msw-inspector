@@ -54,8 +54,8 @@ function createMSWInspector<FunctionMock extends Function>({
       const availablePaths = Array.from(requestLog.keys());
       throw new Error(
         `[msw-inspector] Cannot find a matching requests for path: ${path}. Intercepted requests paths are:\n\n${availablePaths.join(
-          '\n'
-        )}`
+          '\n',
+        )}`,
       );
     },
 

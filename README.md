@@ -70,7 +70,7 @@ describe('My test', () => {
         query: {
           'my-query': 'value',
         },
-      }
+      },
     );
   });
 });

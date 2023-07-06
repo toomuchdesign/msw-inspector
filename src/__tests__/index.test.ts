@@ -42,11 +42,11 @@ describe('getRequests', () => {
             myHeader: 'foo',
           },
           body,
-        }
+        },
       );
 
       expect(
-        mswInspector.getRequests('http://absolute.path/')
+        mswInspector.getRequests('http://absolute.path/'),
       ).toHaveBeenCalledWith({
         method: 'POST',
         headers: {
@@ -71,9 +71,9 @@ describe('getRequests', () => {
       await fetch('http://absolute.path');
 
       expect(() =>
-        mswInspector.getRequests('http://it.was.never.called/')
+        mswInspector.getRequests('http://it.was.never.called/'),
       ).toThrowError(
-        '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://absolute.path'
+        '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://absolute.path',
       );
     });
   });
