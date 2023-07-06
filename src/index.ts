@@ -85,7 +85,7 @@ function createMSWInspector<FunctionMock extends Function>({
     setup() {
       // https://mswjs.io/docs/extensions/life-cycle-events#methods
       //@ts-expect-error type check seems to fail because of  SetupServer | SetupWorker union
-      mockSetup.events.on('request:start', logRequest);
+      mockSetup.events.on('request:match', logRequest);
       return this;
     },
 
@@ -102,7 +102,7 @@ function createMSWInspector<FunctionMock extends Function>({
      */
     teardown() {
       //@ts-expect-error type check seems to fail because of  SetupServer | SetupWorker union
-      mockSetup.events.removeListener('request:start', logRequest);
+      mockSetup.events.removeListener('request:match', logRequest);
       return this;
     },
   };

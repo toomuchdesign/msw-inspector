@@ -149,9 +149,9 @@ const mswInspector = createMSWInspector({
 
 ## Todo
 
-- Consider a better name for `getRequests`
 - Consider listening to network layer with [`@mswjs/interceptors`](https://github.com/mswjs/interceptors) and make MSW inspector usable in non-`msw` projects
 - Todo find out why `SetupServer | SetupWorker` union causes a type error in lifecycle events
+- Consider optionally returning requests not intercepted by `msw` (`'request:start'`/ 'request:match'`)
 
 [ci-badge]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml/badge.svg
 [ci]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml
