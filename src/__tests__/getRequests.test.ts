@@ -80,13 +80,24 @@ describe('getRequests', () => {
 
     describe('no matching calls', () => {
       describe('requesting a url never called', () => {
-        it('throw expected error', async () => {
+        it('throw debug error', async () => {
           await fetch('http://origin.com/path/param');
           expect(() =>
             mswInspector.getRequests('http://it.was.never.called'),
           ).toThrow(
             '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called. Intercepted requests paths are:\n\nhttp://origin.com',
           );
+        });
+
+        describe('"debug" option === false', () => {
+          it('returns empty mock', async () => {
+            await fetch('http://origin.com/path/param');
+            expect(
+              mswInspector.getRequests('http://it.was.never.called', {
+                debug: false,
+              }),
+            ).not.toHaveBeenCalled();
+          });
         });
       });
 

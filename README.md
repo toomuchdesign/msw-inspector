@@ -92,7 +92,7 @@ createMSWInspector({
 });
 ```
 
-#### Options object
+#### `createMSWInspector` Options
 
 `createMSWInspector` accepts the following options object:
 
@@ -149,11 +149,21 @@ const mswInspector = createMSWInspector({
 });
 ```
 
+#### `getRequests` Options
+
+`getRequests` accepts an optional options object
+
+```ts
+mswInspector.getRequests(string, {
+  debug: boolean, // Throw debug error when no matching requests found
+});
+```
+
 ## Todo
 
 - Consider listening to network layer with [`@mswjs/interceptors`](https://github.com/mswjs/interceptors) and make MSW inspector usable in non-`msw` projects
 - Todo find out why `SetupServer | SetupWorker` union causes a type error in lifecycle events
-- Consider optionally returning requests not intercepted by `msw` (`'request:start'`/ 'request:match'`)
+- Consider optionally returning requests not intercepted by `msw` (`request:start`/ `request:match`)
 
 [ci-badge]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml/badge.svg
 [ci]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml

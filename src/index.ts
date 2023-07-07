@@ -37,7 +37,7 @@ function createMSWInspector<FunctionMock extends Function>({
      * @param {string} path Path of a network request (`/path`)
      * @return {*} {FunctionMock}
      */
-    getRequests(path: string): FunctionMock {
+    getRequests(path: string, { debug = true } = {}): FunctionMock {
       let pathURL: URL;
       try {
         pathURL = new URL(path);
@@ -67,7 +67,7 @@ function createMSWInspector<FunctionMock extends Function>({
         }
       });
 
-      if (matches.length === 0) {
+      if (matches.length === 0 && debug) {
         throw new Error(
           makeErrorMessage({
             message: `Cannot find a matching requests for path: ${path}`,
