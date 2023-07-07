@@ -1,4 +1,3 @@
-import { rest } from 'msw';
 import { createMSWInspector, MswInspector } from '../index';
 import { server } from './__mocks__/server';
 

@@ -4,7 +4,7 @@ import { pathToRegexp } from 'path-to-regexp';
 import { defaultRequestLogger } from './defaultRequestLogger';
 import { makeErrorMessage } from './makeErrorMessage';
 
-type RequestLog = { req: MockedRequest; record: Record<string, unknown> };
+type RequestLog = Record<string, unknown>;
 
 /**
  * Create a new MSW inspector instance bound to the provided msw server setup
@@ -18,13 +18,14 @@ function createMSWInspector<FunctionMock extends Function>({
   mockFactory: () => FunctionMock;
   requestLogger?: (req: MockedRequest) => Promise<Record<string, unknown>>;
 }) {
-  // Store network requests by url
+  // Store intercepted network requests by url
   const requestLogs = new Map<string, RequestLog[]>();
 
   async function logRequest(req: MockedRequest): Promise<void> {
     const { href } = req.url;
     const currentRequestLogs = requestLogs.get(href) || [];
-    currentRequestLogs.push({ req, record: await requestLogger(req) });
+    const newLog = await requestLogger(req);
+    currentRequestLogs.push(newLog);
     requestLogs.set(href, currentRequestLogs);
   }
 
@@ -37,27 +38,31 @@ function createMSWInspector<FunctionMock extends Function>({
      * @return {*} {FunctionMock}
      */
     getRequests(path: string): FunctionMock {
-      const matches: RequestLog[] = [];
-      requestLogs.forEach((requests, requestHref) => {
-        const requestsURL = new URL(requestHref);
-        let pathURL: URL;
-        try {
-          pathURL = new URL(path);
-        } catch (error) {
-          throw new Error(
-            makeErrorMessage({
-              message: `Provided path is invalid: ${path}`,
-              requestLogs,
-            }),
-          );
-        }
+      let pathURL: URL;
+      try {
+        pathURL = new URL(path);
+      } catch (error) {
+        throw new Error(
+          makeErrorMessage({
+            message: `Provided path is invalid: ${path}`,
+            requestLogs,
+          }),
+        );
+      }
+      const pathRegex = pathToRegexp(pathURL.pathname);
 
-        if (pathURL.origin !== requestsURL.origin) {
+      // Look for matching logged request records and return them as mock function calls
+      const matches: RequestLog[] = [];
+      requestLogs.forEach((requests, loggedRequestHref) => {
+        const loggedRequestURL = new URL(loggedRequestHref);
+
+        // Test origins
+        if (pathURL.origin !== loggedRequestURL.origin) {
           return;
         }
 
-        const regexp = pathToRegexp(pathURL.pathname);
-        if (regexp.exec(requestsURL.pathname)) {
+        // Test paths
+        if (pathRegex.test(loggedRequestURL.pathname)) {
           matches.push(...requests);
         }
       });
@@ -72,9 +77,9 @@ function createMSWInspector<FunctionMock extends Function>({
       }
 
       const functionMock = mockFactory();
-      for (const { record } of matches) {
-        functionMock(record);
-      }
+      matches.forEach((log) => {
+        functionMock(log);
+      });
       return functionMock;
     },
 

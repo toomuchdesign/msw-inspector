@@ -17,7 +17,7 @@ export async function defaultRequestLogger(
 
   /**
    * Rough attempt to support both text and json bodies.
-   * Shall we respect on "content-type" header instead?
+   * Shall we rely on "content-type" header instead?
    */
   let body;
   try {

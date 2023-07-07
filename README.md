@@ -88,7 +88,7 @@ import { createMSWInspector } from 'msw-inspector';
 createMSWInspector({
   mockSetup, // Any `msw` SetupServer or SetupWorker instance
   mockFactory, // Function returning a mocked function instance to be inspected in your tests
-  requestLogger, // Optional mapper function to customize how requests are stored
+  requestLogger, // Optional mapper function to customize how request records are stored
 });
 ```
 
