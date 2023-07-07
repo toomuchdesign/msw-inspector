@@ -1,16 +1,16 @@
 import qs, { ParsedQs } from 'qs';
 import type { MockedRequest } from 'msw';
 
-export type DefaultRequestLogRecord = {
+export type DefaultRequestRecord = {
   method: string;
   headers: Record<string, string>;
   body?: any;
   query?: ParsedQs;
 };
 
-export async function defaultRequestMapper(
+export async function defaultRequestLogger(
   req: MockedRequest,
-): Promise<DefaultRequestLogRecord> {
+): Promise<DefaultRequestRecord> {
   const { method, headers, url } = req;
   const { search } = url;
   const query = search ? qs.parse(search.substring(1)) : undefined;

@@ -1,6 +1,6 @@
 import {
   createMSWInspector,
-  defaultRequestMapper,
+  defaultRequestLogger,
   MswInspector,
 } from '../index';
 import { server } from './__mocks__/server';
@@ -8,9 +8,9 @@ import { server } from './__mocks__/server';
 const mswInspector: MswInspector = createMSWInspector({
   mockSetup: server,
   mockFactory: () => jest.fn(),
-  requestMapper: async (req) => {
+  requestLogger: async (req) => {
     const { method } = req;
-    const { body } = await defaultRequestMapper(req);
+    const { body } = await defaultRequestLogger(req);
 
     return {
       method,
@@ -31,8 +31,8 @@ afterAll(() => {
   mswInspector.teardown();
 });
 
-describe('requestMapper option', () => {
-  it('replaces default mapping behavior', async () => {
+describe('"requestLogger" option', () => {
+  it('replaces default request record', async () => {
     await fetch('http://origin.com/path/param', {
       method: 'POST',
       body: JSON.stringify({ surname: 'bar' }),

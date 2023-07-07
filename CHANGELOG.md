@@ -8,7 +8,7 @@
 
 ### New Features
 
-- Add `requestMapper` option to customize inspection results
+- Add `requestLogger` option to customize inspection results
 
 # 0.0.1
 

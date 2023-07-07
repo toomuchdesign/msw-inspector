@@ -18,7 +18,7 @@ afterAll(() => {
   mswInspector.teardown();
 });
 
-describe('default request mapper', () => {
+describe('default request logger', () => {
   describe.each([
     {
       body: JSON.stringify({ hello: 'world' }),
