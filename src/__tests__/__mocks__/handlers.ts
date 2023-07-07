@@ -9,10 +9,6 @@ export const handlers = [
     return res(ctx.status(200));
   }),
 
-  rest.get('http://origin.com/path/:param', (req, res, ctx) => {
-    return res(ctx.status(200));
-  }),
-
   rest.get('http://origin.com:1234/path/:param', (req, res, ctx) => {
     return res(ctx.status(200));
   }),

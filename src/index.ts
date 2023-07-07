@@ -36,7 +36,7 @@ function createMSWInspector<FunctionMock extends Function>({
      * @param {string} path Path of a network request (`/path`)
      * @return {*} {FunctionMock}
      */
-    async getRequests(path: string): Promise<FunctionMock> {
+    getRequests(path: string): FunctionMock {
       const matches: RequestLog[] = [];
       requestLogs.forEach((requests, requestHref) => {
         const requestsURL = new URL(requestHref);

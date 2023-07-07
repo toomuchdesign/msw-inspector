@@ -25,10 +25,10 @@ describe('getRequests', () => {
       it('find matching request', async () => {
         await fetch('http://origin.com');
         expect(
-          await mswInspector.getRequests('http://origin.com'),
+          mswInspector.getRequests('http://origin.com'),
         ).toHaveBeenCalledTimes(1);
         expect(
-          await mswInspector.getRequests('http://origin.com/'),
+          mswInspector.getRequests('http://origin.com/'),
         ).toHaveBeenCalledTimes(1);
       });
     });
@@ -37,14 +37,14 @@ describe('getRequests', () => {
       it('returns requests', async () => {
         const path = 'http://origin.com:1234/path/param';
         await fetch(path);
-        expect(await mswInspector.getRequests(path)).toHaveBeenCalledTimes(1);
+        expect(mswInspector.getRequests(path)).toHaveBeenCalledTimes(1);
       });
     });
 
     describe('invalid url provided', () => {
       it('throw invalid url error', async () => {
         await fetch('http://origin.com/path/param');
-        await expect(mswInspector.getRequests('invalid-path')).rejects.toThrow(
+        expect(() => mswInspector.getRequests('invalid-path')).toThrow(
           '[msw-inspector] Provided path is invalid: invalid-path. Intercepted requests paths are:\n\nhttp://origin.com',
         );
       });
@@ -54,7 +54,7 @@ describe('getRequests', () => {
       it('find matching request', async () => {
         await fetch('http://origin.com/path/param');
         expect(
-          await mswInspector.getRequests('http://origin.com/:param1/:param2'),
+          mswInspector.getRequests('http://origin.com/:param1/:param2'),
         ).toHaveBeenCalledTimes(1);
       });
     });
@@ -62,9 +62,9 @@ describe('getRequests', () => {
     describe('less :namedParams then actual paths segments', () => {
       it('throw expected error', async () => {
         await fetch('http://origin.com/path/param');
-        await expect(
+        expect(() =>
           mswInspector.getRequests('http://origin.com/:param1/'),
-        ).rejects.toThrow(
+        ).toThrow(
           '[msw-inspector] Cannot find a matching requests for path: http://origin.com/:param1/. Intercepted requests paths are:\n\nhttp://origin.com',
         );
       });
@@ -74,7 +74,7 @@ describe('getRequests', () => {
       it('find matching request', async () => {
         await fetch('http://origin.com/path/param');
         expect(
-          await mswInspector.getRequests('http://origin.com/(.*)'),
+          mswInspector.getRequests('http://origin.com/(.*)'),
         ).toHaveBeenCalledTimes(1);
       });
     });
@@ -83,9 +83,9 @@ describe('getRequests', () => {
       describe('requesting a url never called', () => {
         it('throw expected error', async () => {
           await fetch('http://origin.com/path/param');
-          await expect(
+          expect(() =>
             mswInspector.getRequests('http://it.was.never.called'),
-          ).rejects.toThrow(
+          ).toThrow(
             '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called. Intercepted requests paths are:\n\nhttp://origin.com',
           );
         });
@@ -98,11 +98,11 @@ describe('getRequests', () => {
             await fetch(
               'https://api.github.com/repos/toomuchdesign/msw-inspector',
             );
-            await expect(
+            expect(() =>
               mswInspector.getRequests(
                 'https://api.github.com/repos/toomuchdesign/msw-inspector',
               ),
-            ).rejects.toThrow(
+            ).toThrow(
               '[msw-inspector] Cannot find a matching requests for path: https://api.github.com/repos/toomuchdesign/msw-inspector.',
             );
           });

@@ -34,7 +34,7 @@ describe('default request logger', () => {
       });
 
       expect(
-        await mswInspector.getRequests('http://origin.com/path/param'),
+        mswInspector.getRequests('http://origin.com/path/param'),
       ).toHaveBeenCalledWith({
         method: 'POST',
         headers: {
@@ -61,7 +61,7 @@ describe('default request logger', () => {
       );
 
       expect(
-        await mswInspector.getRequests('http://origin.com/path/param'),
+        mswInspector.getRequests('http://origin.com/path/param'),
       ).toHaveBeenCalledWith({
         method: 'POST',
         headers: {},
@@ -89,7 +89,7 @@ describe('default request logger', () => {
       });
 
       expect(
-        await mswInspector.getRequests('http://origin.com/path/param'),
+        mswInspector.getRequests('http://origin.com/path/param'),
       ).toHaveBeenCalledWith({
         method: 'POST',
         headers,
@@ -101,7 +101,7 @@ describe('default request logger', () => {
 describe('invalid url provided', () => {
   it('throw invalid url error', async () => {
     await fetch('http://origin.com/path/param');
-    await expect(mswInspector.getRequests('invalid-path')).rejects.toThrowError(
+    expect(() => mswInspector.getRequests('invalid-path')).toThrow(
       '[msw-inspector] Provided path is invalid: invalid-path. Intercepted requests paths are:\n\nhttp://origin.com',
     );
   });
@@ -110,9 +110,9 @@ describe('invalid url provided', () => {
 describe('no matching calls', () => {
   it('throw expected error', async () => {
     await fetch('http://origin.com/path/param');
-    await expect(
+    expect(() =>
       mswInspector.getRequests('http://it.was.never.called/'),
-    ).rejects.toThrowError(
+    ).toThrow(
       '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://origin.com',
     );
   });

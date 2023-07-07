@@ -39,7 +39,7 @@ describe('"requestLogger" option', () => {
     });
 
     expect(
-      await mswInspector.getRequests('http://origin.com/path/param'),
+      mswInspector.getRequests('http://origin.com/path/param'),
     ).toHaveBeenCalledWith({
       method: 'POST',
       customBodyProp: { surname: 'bar' },
