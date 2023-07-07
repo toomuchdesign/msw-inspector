@@ -108,7 +108,7 @@ createMSWInspector({
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
 | **mockSetup** _(required)_   | The instance of `msw` mocks expected to inspect _([`setupWorker`][msw-docs-setup-worker] or [`setupServer`][msw-docs-setup-server] result)_                                         | -                                       |
 | **mockFactory** _(required)_ | A function returning the function mock preferred by your testing framework: It can be `() => jest.fn()` for Jest, `() => sinon.spy()` for Sinon, `() => vi.fn()` for Vitest, etc... | -                                       |
-| **requestMapper**            | Customize default request's key and record mapping with your own logic. Async function.                                                                                             | See [`requestMapper`](src/index.ts#L19) |
+| **requestMapper**            | Customize request's record with your own logic. Async function.                                                                                                                     | See [`requestMapper`](src/index.ts#L19) |
 
 ### `getRequests`
 
@@ -138,7 +138,7 @@ import { createMSWInspector, defaultRequestMapper } from 'msw-inspector';
 
 const mswInspector = createMSWInspector({
   requestMapper: async (req) => {
-    // Optionally use the default request mapper to get the default request object
+    // Optionally use the default request mapper to get the default request log
     const defaultLog = await defaultRequestMapper(req);
 
     return {

@@ -11,21 +11,19 @@ export type DefaultRequestLogRecord = {
 export async function defaultRequestMapper(
   req: MockedRequest,
 ): Promise<DefaultRequestLogRecord> {
-  const { method, headers } = req;
-  const { protocol, host, pathname, search } = req.url;
-
-  // @TODO review key generation
-  const key = protocol + '//' + host + pathname;
+  const { method, headers, url } = req;
+  const { search } = url;
   const query = search ? qs.parse(search.substring(1)) : undefined;
 
-  const bodyAsText = await req.text();
+  /**
+   * Rough attempt to support both text and json bodies.
+   * Shall we respect on "content-type" header instead?
+   */
   let body;
-
-  // A rough attempt to support both text and json bodies
   try {
-    body = JSON.parse(bodyAsText);
+    body = await req.json();
   } catch (err) {
-    body = bodyAsText;
+    body = await req.clone().text();
   }
 
   return {
