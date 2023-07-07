@@ -20,7 +20,7 @@ MSW inspector has you covered for these special cases.
 
 MSW inspector provides a thin layer of logic over [msw life-cycle events][msw-docs-life-cycle-events].
 
-Each request is saved as a **function mock call** retrievable by URL. This allows elegant assertions against request information like `method`, `headers`, `body`, `query`.
+Each request is saved as a **function mock call** retrievable by URL. This allows elegant assertions against request records like `method`, `headers`, `body`, `query` fully integrates with your test assertion library.
 
 ## Installation
 
@@ -112,15 +112,15 @@ createMSWInspector({
 
 ### `getRequests`
 
-Returns a mocked function containing all the calls intercepted at the provided absolute url:
+Returns a mocked function pre-called with all the request records whose absolute url match the provided one:
 
 ```ts
 mswInspector.getRequests('http://my.url/path/:param');
 ```
 
-The matching url can be described flexibly by optionally using [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) syntax.
+The matching url can be provided as plain absolute url string or [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) matching pattern.
 
-By default each intercepted request calls the matching mocked function with the following request log record:
+By default, each matching request results into a mocked function call with the following request log record:
 
 ```ts
 type DefaultRequestLogRecord = {
@@ -130,6 +130,8 @@ type DefaultRequestLogRecord = {
   query?: Record<string, string>;
 };
 ```
+
+...the call order is preserved.
 
 If you want to create a different request record you can do so by providing a custom `requestLogger`:
 
