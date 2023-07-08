@@ -112,13 +112,20 @@ createMSWInspector({
 
 ### `getRequests`
 
-Returns a mocked function pre-called with all the request records whose absolute url match the provided one:
+Returns a mocked function pre-called with all the request records whose absolute url match the provided one.
+
+The matching url can be provided as:
+
+- plain absolute url string
+- [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) matching pattern
 
 ```ts
+// Full string match
+mswInspector.getRequests('http://my.url/path/foo');
+
+// Url matching patter
 mswInspector.getRequests('http://my.url/path/:param');
 ```
-
-The matching url can be provided as plain absolute url string or [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) matching pattern.
 
 By default, each matching request results into a mocked function call with the following request log record:
 
@@ -157,7 +164,7 @@ const mswInspector = createMSWInspector({
 
 ```ts
 mswInspector.getRequests(string, {
-  debug: boolean, // Throw debug error when no matching requests found
+  debug: boolean, // Throw debug error when no matching requests found (default: true)
 });
 ```
 
