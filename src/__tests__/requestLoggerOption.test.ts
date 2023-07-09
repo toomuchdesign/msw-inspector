@@ -1,6 +1,6 @@
 import {
   createMSWInspector,
-  defaultRequestMapper,
+  defaultRequestLogger,
   MswInspector,
 } from '../index';
 import { server } from './__mocks__/server';
@@ -8,19 +8,13 @@ import { server } from './__mocks__/server';
 const mswInspector: MswInspector = createMSWInspector({
   mockSetup: server,
   mockFactory: () => jest.fn(),
-  requestMapper: async (req) => {
+  requestLogger: async (req) => {
     const { method } = req;
-    const { pathname } = req.url;
-    const {
-      record: { body },
-    } = await defaultRequestMapper(req);
+    const { body } = await defaultRequestLogger(req);
 
     return {
-      key: pathname,
-      record: {
-        method,
-        customBodyProp: body,
-      },
+      method,
+      customBodyProp: body,
     };
   },
 });
@@ -37,14 +31,16 @@ afterAll(() => {
   mswInspector.teardown();
 });
 
-describe('requestMapper option', () => {
-  it('replaces default mapping behavior', async () => {
-    await fetch('http://absolute.path/path-name', {
+describe('"requestLogger" option', () => {
+  it('replaces default request record', async () => {
+    await fetch('http://origin.com/path/param', {
       method: 'POST',
       body: JSON.stringify({ surname: 'bar' }),
     });
 
-    expect(mswInspector.getRequests('/path-name')).toHaveBeenCalledWith({
+    expect(
+      mswInspector.getRequests('http://origin.com/path/param'),
+    ).toHaveBeenCalledWith({
       method: 'POST',
       customBodyProp: { surname: 'bar' },
     });

@@ -6,6 +6,9 @@ on:
       - master
   pull_request:
 
+env:
+  CI: true
+
 jobs:
   build:
     runs-on: ubuntu-latest

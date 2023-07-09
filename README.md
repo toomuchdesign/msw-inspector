@@ -20,7 +20,7 @@ MSW inspector has you covered for these special cases.
 
 MSW inspector provides a thin layer of logic over [msw life-cycle events][msw-docs-life-cycle-events].
 
-Each request is saved as a **function mock call** retrievable by URL. This allows elegant assertions against request information like `method`, `headers`, `body`, `query`.
+Each request is saved as a **function mock call** retrievable by URL. This allows elegant assertions against request records like `method`, `headers`, `body`, `query` fully integrates with your test assertion library.
 
 ## Installation
 
@@ -88,11 +88,11 @@ import { createMSWInspector } from 'msw-inspector';
 createMSWInspector({
   mockSetup, // Any `msw` SetupServer or SetupWorker instance
   mockFactory, // Function returning a mocked function instance to be inspected in your tests
-  requestMapper, // Optional mapper function to customize how requests are stored
+  requestLogger, // Optional mapper function to customize how request records are stored
 });
 ```
 
-#### Options object
+#### `createMSWInspector` Options
 
 `createMSWInspector` accepts the following options object:
 
@@ -100,10 +100,7 @@ createMSWInspector({
  {
   mockSetup: SetupServer | SetupWorker;
   mockFactory: () => FunctionMock;
-  requestMapper?: (req: MockedRequest) => Promise<{
-    key: string;
-    record: Record<string, any>;
-  }>;
+  requestLogger?: (req: MockedRequest) => Promise<Record<string, unknown>>;
 }
 ```
 
@@ -111,17 +108,26 @@ createMSWInspector({
 | ---------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------- |
 | **mockSetup** _(required)_   | The instance of `msw` mocks expected to inspect _([`setupWorker`][msw-docs-setup-worker] or [`setupServer`][msw-docs-setup-server] result)_                                         | -                                       |
 | **mockFactory** _(required)_ | A function returning the function mock preferred by your testing framework: It can be `() => jest.fn()` for Jest, `() => sinon.spy()` for Sinon, `() => vi.fn()` for Vitest, etc... | -                                       |
-| **requestMapper**            | Customize default request's key and record mapping with your own logic. Async function.                                                                                             | See [`requestMapper`](src/index.ts#L15) |
+| **requestLogger**            | Customize request records with your own object. Async function.                                                                                                                     | See [`requestLogger`](src/index.ts#L19) |
 
 ### `getRequests`
 
-Returns a mocked function containing all the calls intercepted at the given absolute url (by default):
+Returns a mocked function pre-called with all the request records whose absolute url match the provided one.
+
+The matching url can be provided as:
+
+- plain absolute url string
+- [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) matching pattern
 
 ```ts
-mswInspector.getRequests('http://my.url/path');
+// Full string match
+mswInspector.getRequests('http://my.url/path/foo');
+
+// Url matching patter
+mswInspector.getRequests('http://my.url/path/:param');
 ```
 
-By default each intercepted request calls the matching mocked function with the following request log record:
+By default, each matching request results into a mocked function call with the following request log record:
 
 ```ts
 type DefaultRequestLogRecord = {
@@ -132,32 +138,41 @@ type DefaultRequestLogRecord = {
 };
 ```
 
-If you want to create a different log record you can do so by providing a custom `requestMapper`:
+...the call order is preserved.
+
+If you want to create a different request record you can do so by providing a custom `requestLogger`:
 
 ```ts
-import { createMSWInspector, defaultRequestMapper } from 'msw-inspector';
+import { createMSWInspector, defaultRequestLogger } from 'msw-inspector';
 
 const mswInspector = createMSWInspector({
-  requestMapper: async (req) => {
-    // Optionally use the default request mapper to get the default request object
-    const defaultLog = await defaultRequestMapper(req);
+  requestLogger: async (req) => {
+    // Optionally use the default request mapper to get the default request log
+    const defaultRecord = await defaultRequestLogger(req);
 
     return {
-      key: pathname,
-      record: {
-        myMethodProp: req.method,
-        myBodyProp: defaultLog.record.body,
-      },
+      myMethodProp: req.method,
+      myBodyProp: defaultRecord.body,
     };
   },
 });
 ```
 
+#### `getRequests` Options
+
+`getRequests` accepts an optional options object
+
+```ts
+mswInspector.getRequests(string, {
+  debug: boolean, // Throw debug error when no matching requests found (default: true)
+});
+```
+
 ## Todo
 
-- Consider a better name for `getRequests`
 - Consider listening to network layer with [`@mswjs/interceptors`](https://github.com/mswjs/interceptors) and make MSW inspector usable in non-`msw` projects
 - Todo find out why `SetupServer | SetupWorker` union causes a type error in lifecycle events
+- Consider optionally returning requests not intercepted by `msw` (`request:start`/ `request:match`)
 
 [ci-badge]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml/badge.svg
 [ci]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml

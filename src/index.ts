@@ -1,6 +1,10 @@
 import type { MockedRequest, SetupWorker } from 'msw';
 import type { SetupServer } from 'msw/node';
-import { defaultRequestMapper } from './defaultRequestMapper';
+import { pathToRegexp } from 'path-to-regexp';
+import { defaultRequestLogger } from './defaultRequestLogger';
+import { makeErrorMessage } from './makeErrorMessage';
+
+type RequestLog = Record<string, unknown>;
 
 /**
  * Create a new MSW inspector instance bound to the provided msw server setup
@@ -8,33 +12,21 @@ import { defaultRequestMapper } from './defaultRequestMapper';
 function createMSWInspector<FunctionMock extends Function>({
   mockSetup,
   mockFactory,
-  requestMapper = defaultRequestMapper,
+  requestLogger = defaultRequestLogger,
 }: {
   mockSetup: SetupServer | SetupWorker;
   mockFactory: () => FunctionMock;
-  requestMapper?: (req: MockedRequest) => Promise<{
-    key: string;
-    record: Record<string, any>;
-  }>;
+  requestLogger?: (req: MockedRequest) => Promise<Record<string, unknown>>;
 }) {
-  // Store network requests by url
-  const requestLog = new Map<string, FunctionMock>();
+  // Store intercepted network requests by url
+  const requestLogs = new Map<string, RequestLog[]>();
 
   async function logRequest(req: MockedRequest): Promise<void> {
-    const { key, record } = await requestMapper(req);
-
-    if (!requestLog.has(key)) {
-      // Create an inspectionable request log and store it in requestLog map
-      // Create a new request log entry (a function mock of any testing framework) for current url, if necessary
-      const newRequestLogEntry = mockFactory();
-      requestLog.set(key, newRequestLogEntry);
-    }
-
-    const requestLogEntry = requestLog.get(key);
-    if (requestLogEntry) {
-      // Here we call function mock on order for tests to inspect it
-      requestLogEntry(record);
-    }
+    const { href } = req.url;
+    const currentRequestLogs = requestLogs.get(href) || [];
+    const newLog = await requestLogger(req);
+    currentRequestLogs.push(newLog);
+    requestLogs.set(href, currentRequestLogs);
   }
 
   return {
@@ -45,18 +37,50 @@ function createMSWInspector<FunctionMock extends Function>({
      * @param {string} path Path of a network request (`/path`)
      * @return {*} {FunctionMock}
      */
-    getRequests(path: string): FunctionMock {
-      const requestLogEntry = requestLog.get(path);
-      if (requestLogEntry) {
-        return requestLogEntry;
+    getRequests(path: string, { debug = true } = {}): FunctionMock {
+      let pathURL: URL;
+      try {
+        pathURL = new URL(path);
+      } catch (error) {
+        throw new Error(
+          makeErrorMessage({
+            message: `Provided path is invalid: ${path}`,
+            requestLogs,
+          }),
+        );
+      }
+      const pathRegex = pathToRegexp(pathURL.pathname);
+
+      // Look for matching logged request records and return them as mock function calls
+      const matches: RequestLog[] = [];
+      requestLogs.forEach((requests, loggedRequestHref) => {
+        const loggedRequestURL = new URL(loggedRequestHref);
+
+        // Test origins
+        if (pathURL.origin !== loggedRequestURL.origin) {
+          return;
+        }
+
+        // Test paths
+        if (pathRegex.test(loggedRequestURL.pathname)) {
+          matches.push(...requests);
+        }
+      });
+
+      if (matches.length === 0 && debug) {
+        throw new Error(
+          makeErrorMessage({
+            message: `Cannot find a matching requests for path: ${path}`,
+            requestLogs,
+          }),
+        );
       }
 
-      const availablePaths = Array.from(requestLog.keys());
-      throw new Error(
-        `[msw-inspector] Cannot find a matching requests for path: ${path}. Intercepted requests paths are:\n\n${availablePaths.join(
-          '\n',
-        )}`,
-      );
+      const functionMock = mockFactory();
+      matches.forEach((log) => {
+        functionMock(log);
+      });
+      return functionMock;
     },
 
     /**
@@ -65,7 +89,7 @@ function createMSWInspector<FunctionMock extends Function>({
     setup() {
       // https://mswjs.io/docs/extensions/life-cycle-events#methods
       //@ts-expect-error type check seems to fail because of  SetupServer | SetupWorker union
-      mockSetup.events.on('request:start', logRequest);
+      mockSetup.events.on('request:match', logRequest);
       return this;
     },
 
@@ -73,7 +97,7 @@ function createMSWInspector<FunctionMock extends Function>({
      * Clear msw spy call log. Call it before every single test execution
      */
     clear() {
-      requestLog.clear();
+      requestLogs.clear();
       return this;
     },
 
@@ -82,11 +106,11 @@ function createMSWInspector<FunctionMock extends Function>({
      */
     teardown() {
       //@ts-expect-error type check seems to fail because of  SetupServer | SetupWorker union
-      mockSetup.events.removeListener('request:start', logRequest);
+      mockSetup.events.removeListener('request:match', logRequest);
       return this;
     },
   };
 }
 
 export type MswInspector = ReturnType<typeof createMSWInspector>;
-export { createMSWInspector, defaultRequestMapper };
+export { createMSWInspector, defaultRequestLogger };
