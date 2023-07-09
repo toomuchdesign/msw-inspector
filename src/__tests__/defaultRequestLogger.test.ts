@@ -28,6 +28,7 @@ describe('default request logger', () => {
     { body: 'Plain text', expectedBody: 'Plain text', type: 'text' },
   ])('body as $type', ({ body, expectedBody, type }) => {
     it('returns expected body value', async () => {
+      // @ts-expect-error fetch not typed in Node18
       await fetch(`http://origin.com/path/param`, {
         method: 'POST',
         body,
@@ -53,6 +54,7 @@ describe('default request logger', () => {
         object: 'object[prop1]=value1&object[prop2]=value2',
       };
 
+      // @ts-expect-error fetch not typed in Node18
       await fetch(
         `http://origin.com/path/param?${queryString.string}&${queryString.array}&${queryString.object}`,
         {
@@ -83,6 +85,7 @@ describe('default request logger', () => {
         header1: 'header-1',
         header2: 'header-2',
       };
+      // @ts-expect-error fetch not typed in Node18
       await fetch(`http://origin.com/path/param`, {
         method: 'POST',
         headers,
@@ -100,6 +103,7 @@ describe('default request logger', () => {
 
 describe('invalid url provided', () => {
   it('throw invalid url error', async () => {
+    // @ts-expect-error fetch not typed in Node18
     await fetch('http://origin.com/path/param');
     expect(() => mswInspector.getRequests('invalid-path')).toThrow(
       '[msw-inspector] Provided path is invalid: invalid-path. Intercepted requests paths are:\n\nhttp://origin.com',
@@ -109,6 +113,7 @@ describe('invalid url provided', () => {
 
 describe('no matching calls', () => {
   it('throw expected error', async () => {
+    // @ts-expect-error fetch not typed in Node18
     await fetch('http://origin.com/path/param');
     expect(() =>
       mswInspector.getRequests('http://it.was.never.called/'),

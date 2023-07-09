@@ -33,6 +33,7 @@ afterAll(() => {
 
 describe('"requestLogger" option', () => {
   it('replaces default request record', async () => {
+    // @ts-expect-error fetch not typed in Node18
     await fetch('http://origin.com/path/param', {
       method: 'POST',
       body: JSON.stringify({ surname: 'bar' }),
