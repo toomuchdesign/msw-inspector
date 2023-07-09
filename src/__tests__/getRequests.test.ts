@@ -22,6 +22,7 @@ describe('getRequests', () => {
   describe('path matching', () => {
     describe('origin with or without trailing slash', () => {
       it('find matching request', async () => {
+        // @ts-expect-error fetch not typed in Node18
         await fetch('http://origin.com');
         expect(
           mswInspector.getRequests('http://origin.com'),
@@ -34,8 +35,11 @@ describe('getRequests', () => {
 
     describe('multiple matching calls', () => {
       it('preserves calls order', async () => {
+        // @ts-expect-error fetch not typed in Node18
         await fetch('http://origin.com', { headers: { id: 'first' } });
+        // @ts-expect-error fetch not typed in Node18
         await fetch('http://origin.com', { headers: { id: 'second' } });
+        // @ts-expect-error fetch not typed in Node18
         await fetch('http://origin.com', { headers: { id: 'third' } });
 
         const matchingCalls = mswInspector.getRequests('http://origin.com');
@@ -55,6 +59,7 @@ describe('getRequests', () => {
     describe('url with port', () => {
       it('returns requests', async () => {
         const path = 'http://origin.com:1234/path/param';
+        // @ts-expect-error fetch not typed in Node18
         await fetch(path);
         expect(mswInspector.getRequests(path)).toHaveBeenCalledTimes(1);
       });
@@ -63,6 +68,7 @@ describe('getRequests', () => {
     describe('matching patterns', () => {
       describe('multiple :namedParams', () => {
         it('find matching request', async () => {
+          // @ts-expect-error fetch not typed in Node18
           await fetch('http://origin.com/path/param');
           expect(
             mswInspector.getRequests('http://origin.com/:param1/:param2'),
@@ -72,6 +78,7 @@ describe('getRequests', () => {
 
       describe('less :namedParams then actual paths segments', () => {
         it('throw expected error', async () => {
+          // @ts-expect-error fetch not typed in Node18
           await fetch('http://origin.com/path/param');
           expect(() =>
             mswInspector.getRequests('http://origin.com/:param1/'),
@@ -83,6 +90,7 @@ describe('getRequests', () => {
 
       describe('wildcard (.*)', () => {
         it('find matching request', async () => {
+          // @ts-expect-error fetch not typed in Node18
           await fetch('http://origin.com/path/param');
           expect(
             mswInspector.getRequests('http://origin.com/(.*)'),
@@ -93,6 +101,7 @@ describe('getRequests', () => {
 
     describe('invalid url provided', () => {
       it('throw invalid url error', async () => {
+        // @ts-expect-error fetch not typed in Node18
         await fetch('http://origin.com/path/param');
         expect(() => mswInspector.getRequests('invalid-path')).toThrow(
           '[msw-inspector] Provided path is invalid: invalid-path. Intercepted requests paths are:\n\nhttp://origin.com',
@@ -102,6 +111,7 @@ describe('getRequests', () => {
 
     describe('requesting a url never called', () => {
       it('throw debug error', async () => {
+        // @ts-expect-error fetch not typed in Node18
         await fetch('http://origin.com/path/param');
         expect(() =>
           mswInspector.getRequests('http://it.was.never.called'),
@@ -112,6 +122,7 @@ describe('getRequests', () => {
 
       describe('"debug" option === false', () => {
         it('returns empty mock', async () => {
+          // @ts-expect-error fetch not typed in Node18
           await fetch('http://origin.com/path/param');
           expect(
             mswInspector.getRequests('http://it.was.never.called', {
@@ -126,6 +137,7 @@ describe('getRequests', () => {
     if (process.env.CI) {
       describe('calling and requesting a url not registered as MSW handler', () => {
         it('throw expected error', async () => {
+          // @ts-expect-error fetch not typed in Node18
           await fetch(
             'https://api.github.com/repos/toomuchdesign/msw-inspector',
           );
