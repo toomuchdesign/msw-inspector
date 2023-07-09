@@ -2,6 +2,7 @@
 
 ### Breaking change
 
+- Drop support for Node.js v16
 - Query object parsed with `qs` library
 - `requestMapper` option replaced by `requestLogger`
 
