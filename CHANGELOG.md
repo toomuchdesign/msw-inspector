@@ -1,3 +1,16 @@
+# 2.0.0
+
+### Breaking change
+
+- Query object parsed with `qs` library
+- `requestMapper` option replaced by `requestLogger`
+
+### New Features
+
+- Pattern matching powered by `path-to-regexp`
+- `debug` option added
+- Throw error when invalid URL provided
+
 # 1.0.0
 
 ### Breaking change

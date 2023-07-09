@@ -86,9 +86,9 @@ Create a `MSW inspector` instance bound to a specific `msw` [SetupServer][msw-do
 import { createMSWInspector } from 'msw-inspector';
 
 createMSWInspector({
-  mockSetup, // Any `msw` SetupServer or SetupWorker instance
+  mockSetup, // You `msw` SetupServer or SetupWorker instance
   mockFactory, // Function returning a mocked function instance to be inspected in your tests
-  requestLogger, // Optional mapper function to customize how request records are stored
+  requestLogger, // Optional logger function to customize request logs
 });
 ```
 
