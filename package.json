@@ -36,6 +36,7 @@
   "author": "Andrea Carraro <me@andreacarraro.it>",
   "license": "ISC",
   "devDependencies": {
+    "@tsconfig/node18": "^18.2.0",
     "@types/jest": "^29.5.2",
     "@types/node": "^18.0.0",
     "@types/qs": "^6.9.7",
@@ -53,7 +54,7 @@
     "pre-commit": "npm run test:source"
   },
   "jest": {
-    "preset": "ts-jest/presets/js-with-ts",
+    "preset": "ts-jest",
     "testEnvironmentOptions": {
       "url": "http://localhost/"
     },
@@ -69,7 +70,7 @@
     ]
   },
   "engines": {
-    "node": ">=v16.0.0"
+    "node": ">=18"
   },
   "dependencies": {
     "path-to-regexp": "^6.2.1",

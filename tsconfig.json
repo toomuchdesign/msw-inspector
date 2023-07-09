@@ -1,16 +1,8 @@
 {
+  "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
-    "module": "commonjs",
-    "target": "es2021",
-    "strict": true,
-    "esModuleInterop": true,
-    "noErrorTruncation": true,
-    "outDir": "dist",
-    "allowJs": true,
-    "declaration": true,
-    "paths": {
-      "*": ["./@types/*"]
-    }
+    "baseUrl": ".",
+    "noErrorTruncation": true
   },
-  "include": ["./src"]
+  "exclude": ["./dist"]
 }
