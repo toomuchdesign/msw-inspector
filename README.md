@@ -4,7 +4,7 @@
 [![Npm version][npm-version-badge]][npm]
 [![Test coverage report][coveralls-badge]][coveralls]
 
-Plug-and-play **request assertion** utility for any [`msw`][msw] mock setup, as [highly discouraged][msw-docs-request-assertions] by `msw` authors :)
+Plug-and-play **request assertion** utility for any [`msw`][msw] mock setup, as [highly discouraged][msw-docs-request-assertions] by `msw` authors
 
 ## Why?
 
