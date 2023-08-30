@@ -9,7 +9,7 @@
   ],
   "scripts": {
     "clean": "rm -rf dist",
-    "compile": "npm run clean && tsc -p tsconfig.build.json",
+    "build": "npm run clean && tsc -p tsconfig.build.json",
     "test": "jest ./src",
     "test:source": "npm run test:format && npm run test:ts && npm t -- --coverage",
     "test:ts": "tsc --noEmit",
@@ -17,7 +17,7 @@
     "preversion": "npm run prepare",
     "version": "git add package.json",
     "postversion": "git push && git push --tags",
-    "prepare": "npx simple-git-hooks && npm run test:source && npm run compile",
+    "prepare": "npx simple-git-hooks && npm run test:source && npm run build",
     "prettier": "prettier --check .",
     "prettier:fix": "prettier --write ."
   },
