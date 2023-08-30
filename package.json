@@ -10,6 +10,7 @@
   "scripts": {
     "clean": "rm -rf dist",
     "compile": "npm run clean && tsc -p tsconfig.build.json",
+    "tag": "node ./scripts/tag.js",
     "test": "jest ./src",
     "test:source": "npm run test:format && npm run test:ts && npm t -- --coverage",
     "test:ts": "tsc --noEmit",
