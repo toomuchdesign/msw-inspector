@@ -58,20 +58,20 @@ describe('My test', () => {
   it('My test', async () => {
     // Perform your tests
 
-    expect(mswInspector.getRequests('http://my.url/path')).toHaveBeenCalledWith(
-      {
-        method: 'GET',
-        headers: {
-          'my-header': 'value',
-        },
-        body: {
-          'my-body': 'value',
-        },
-        query: {
-          'my-query': 'value',
-        },
+    expect(
+      await mswInspector.getRequests('http://my.url/path'),
+    ).toHaveBeenCalledWith({
+      method: 'GET',
+      headers: {
+        'my-header': 'value',
       },
-    );
+      body: {
+        'my-body': 'value',
+      },
+      query: {
+        'my-query': 'value',
+      },
+    });
   });
 });
 ```
@@ -112,7 +112,7 @@ createMSWInspector({
 
 ### `getRequests`
 
-Returns a mocked function pre-called with all the request records whose absolute url match the provided one.
+Returns a promise returning a mocked function pre-called with all the request records whose absolute url match the provided one.
 
 The matching url can be provided as:
 
@@ -121,10 +121,10 @@ The matching url can be provided as:
 
 ```ts
 // Full string match
-mswInspector.getRequests('http://my.url/path/foo');
+await mswInspector.getRequests('http://my.url/path/foo');
 
 // Url matching patter
-mswInspector.getRequests('http://my.url/path/:param');
+await mswInspector.getRequests('http://my.url/path/:param');
 ```
 
 By default, each matching request results into a mocked function call with the following request log record:
@@ -163,7 +163,7 @@ const mswInspector = createMSWInspector({
 `getRequests` accepts an optional options object
 
 ```ts
-mswInspector.getRequests(string, {
+await mswInspector.getRequests(string, {
   debug: boolean, // Throw debug error when no matching requests found (default: true)
 });
 ```
@@ -171,7 +171,6 @@ mswInspector.getRequests(string, {
 ## Todo
 
 - Consider listening to network layer with [`@mswjs/interceptors`](https://github.com/mswjs/interceptors) and make MSW inspector usable in non-`msw` projects
-- Todo find out why `SetupServer | SetupWorker` union causes a type error in lifecycle events
 - Consider optionally returning requests not intercepted by `msw` (`request:start`/ `request:match`)
 
 [ci-badge]: https://github.com/toomuchdesign/msw-inspector/actions/workflows/ci.yml/badge.svg
