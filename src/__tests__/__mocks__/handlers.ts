@@ -1,19 +1,19 @@
-import { rest } from 'msw';
+import { http, HttpResponse } from 'msw';
 
 export const handlers = [
-  rest.get('http://origin.com', (req, res, ctx) => {
-    return res(ctx.status(200));
+  http.get('http://origin.com', () => {
+    return HttpResponse.json({ status: 200 });
   }),
 
-  rest.get('http://origin.com/path/:param', (req, res, ctx) => {
-    return res(ctx.status(200));
+  http.get('http://origin.com/path/:param', () => {
+    return HttpResponse.json({ status: 200 });
   }),
 
-  rest.get('http://origin.com:1234/path/:param', (req, res, ctx) => {
-    return res(ctx.status(200));
+  http.get('http://origin.com:1234/path/:param', () => {
+    return HttpResponse.json({ status: 200 });
   }),
 
-  rest.post('http://origin.com/path/:param', (req, res, ctx) => {
-    return res(ctx.status(200));
+  http.post('http://origin.com/path/:param', () => {
+    return HttpResponse.json({ status: 200 });
   }),
 ];

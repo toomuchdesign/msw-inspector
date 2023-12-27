@@ -1,3 +1,10 @@
+# 3.0.0
+
+### Breaking change
+
+- Support `msw` v2+
+- `mswInspector.getRequests` method switched from sync to async
+
 # 2.0.0
 
 ### Breaking change

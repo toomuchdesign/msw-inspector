@@ -1,11 +1,11 @@
 export function makeErrorMessage({
   message,
-  requestLogs,
+  interceptedRequests,
 }: {
   message: string;
-  requestLogs: Map<string, unknown>;
+  interceptedRequests: Map<string, Request[]>;
 }): string {
-  const availablePaths = Array.from(requestLogs.keys());
+  const availablePaths = Array.from(interceptedRequests.keys());
   return `[msw-inspector] ${message}. Intercepted requests paths are:\n\n${availablePaths.join(
     '\n',
   )}`;

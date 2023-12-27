@@ -1,5 +1,4 @@
 import qs, { ParsedQs } from 'qs';
-import type { MockedRequest } from 'msw';
 
 export type DefaultRequestRecord = {
   method: string;
@@ -9,10 +8,10 @@ export type DefaultRequestRecord = {
 };
 
 export async function defaultRequestLogger(
-  req: MockedRequest,
+  request: Request,
 ): Promise<DefaultRequestRecord> {
-  const { method, headers, url } = req;
-  const { search } = url;
+  const { method, headers, url } = request;
+  const { search } = new URL(url);
   const query = search ? qs.parse(search.substring(1)) : undefined;
 
   /**
@@ -21,14 +20,14 @@ export async function defaultRequestLogger(
    */
   let body;
   try {
-    body = await req.json();
+    body = await request.clone().json();
   } catch (err) {
-    body = await req.clone().text();
+    body = await request.clone().text();
   }
 
   return {
     method,
-    headers: headers.all(),
+    headers: Object.fromEntries(headers),
     ...(body && { body }),
     ...(query && { query }),
   };
