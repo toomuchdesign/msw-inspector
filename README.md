@@ -20,7 +20,7 @@ MSW inspector has you covered for these special cases.
 
 MSW inspector provides a thin layer of logic over [msw life-cycle events][msw-docs-life-cycle-events].
 
-Each request is saved as a **function mock call** retrievable by URL. This allows elegant assertions against request records like `method`, `headers`, `body`, `query` fully integrates with your test assertion library.
+Each intercepted request is stored as a **function mock call** retrievable by URL. This allows elegant assertions against request attributes like `method`, `headers`, `body` and `query` fully integrated with your test assertion library.
 
 ## Installation
 
@@ -32,11 +32,12 @@ npm install msw-inspector -D
 
 This example uses Jest, but MSW inspector integrates with **any testing framework**.
 
-```js
+```ts
 import { jest } from '@jest/globals';
 import { createMSWInspector } from 'msw-inspector';
 import { server } from './your-msw-server';
 
+// Setup MSW inspector (should be declared once as a global test setup routine)
 const mswInspector = createMSWInspector({
   mockSetup: server,
   mockFactory: () => jest.fn(), // Provide any function mock supported by your testing library
@@ -55,21 +56,29 @@ afterAll(() => {
 });
 
 describe('My test', () => {
-  it('My test', async () => {
-    // Perform your tests
+  it('Performs expected network request', async () => {
+    await fetch('http://my.url/path?myQuery=value', {
+      method: 'POST',
+      headers: {
+        myHeader: 'value',
+      },
+      body: JSON.stringify({
+        myBody: 'value',
+      }),
+    });
 
     expect(
       await mswInspector.getRequests('http://my.url/path'),
     ).toHaveBeenCalledWith({
-      method: 'GET',
+      method: 'POST',
       headers: {
-        'my-header': 'value',
+        myHeader: 'value',
       },
       body: {
-        'my-body': 'value',
+        myBody: 'value',
       },
       query: {
-        'my-query': 'value',
+        myQuery: 'value',
       },
     });
   });
