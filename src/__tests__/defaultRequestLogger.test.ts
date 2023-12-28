@@ -1,9 +1,18 @@
+import {
+  beforeAll,
+  beforeEach,
+  afterAll,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
 import { createMSWInspector, MswInspector } from '../index';
 import { server } from './__mocks__/server';
 
 const mswInspector: MswInspector = createMSWInspector({
   mockSetup: server,
-  mockFactory: () => jest.fn(),
+  mockFactory: () => vi.fn(),
 });
 
 beforeAll(() => {
