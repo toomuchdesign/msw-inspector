@@ -1,4 +1,13 @@
 import {
+  beforeAll,
+  beforeEach,
+  afterAll,
+  describe,
+  expect,
+  it,
+  vi,
+} from 'vitest';
+import {
   createMSWInspector,
   defaultRequestLogger,
   MswInspector,
@@ -7,7 +16,7 @@ import { server } from './__mocks__/server';
 
 const mswInspector: MswInspector = createMSWInspector({
   mockSetup: server,
-  mockFactory: () => jest.fn(),
+  mockFactory: () => vi.fn(),
   requestLogger: async (req) => {
     const { method } = req;
     const { body } = await defaultRequestLogger(req);

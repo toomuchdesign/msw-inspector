@@ -1,3 +1,4 @@
+import { beforeAll, afterAll, afterEach } from 'vitest';
 import { server } from './src/__tests__/__mocks__/server';
 
 // https://mswjs.io/docs/getting-started/integrate/node
