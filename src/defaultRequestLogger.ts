@@ -28,7 +28,7 @@ export async function defaultRequestLogger(
   return {
     method,
     headers: Object.fromEntries(headers),
-    ...(body && { body }),
+    ...(body ? { body } : {}),
     ...(query && { query }),
   };
 }
