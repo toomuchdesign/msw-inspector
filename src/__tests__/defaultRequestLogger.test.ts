@@ -138,4 +138,19 @@ describe('default request logger', () => {
       );
     });
   });
+
+  describe('body already used by MSW handler', () => {
+    it('throw expected error', async () => {
+      await fetch('http://origin.com/used-body', {
+        method: 'POST',
+        body: JSON.stringify({ hello: 'world' }),
+      });
+
+      expect(
+        mswInspector.getRequests('http://origin.com/used-body'),
+      ).rejects.toThrowError(
+        '[msw-inspector] request.body already read. Make sure your msw handlers clone the request with "request.clone()" before they read the body.',
+      );
+    });
+  });
 });
