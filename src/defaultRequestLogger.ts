@@ -1,4 +1,5 @@
 import qs, { ParsedQs } from 'qs';
+import { makeErrorMessage } from './makeErrorMessage';
 
 export type DefaultRequestRecord = {
   method: string;
@@ -10,6 +11,12 @@ export type DefaultRequestRecord = {
 export async function defaultRequestLogger(
   request: Request,
 ): Promise<DefaultRequestRecord> {
+  if (request.bodyUsed) {
+    throw new Error(
+      '[msw-inspector] request.body already read. Make sure your msw handlers clone the request with "request.clone()" before they read the body.',
+    );
+  }
+
   const { method, headers, url } = request;
   const { search } = new URL(url);
   const query = search ? qs.parse(search.substring(1)) : undefined;
