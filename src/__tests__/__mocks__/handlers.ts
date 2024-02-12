@@ -16,4 +16,8 @@ export const handlers = [
   http.post('http://origin.com/path/:param', () => {
     return HttpResponse.json({ status: 200 });
   }),
+
+  http.get('http://origin.com/non-json-response', () => {
+    return new HttpResponse({ status: 404 });
+  }),
 ];

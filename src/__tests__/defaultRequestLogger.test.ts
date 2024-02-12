@@ -86,6 +86,19 @@ describe('default request logger', () => {
     });
   });
 
+  describe('non-json response', () => {
+    it('returns expected call', async () => {
+      await fetch('http://origin.com/non-json-response');
+
+      expect(
+        await mswInspector.getRequests('http://origin.com/non-json-response'),
+      ).toHaveBeenCalledWith({
+        method: 'GET',
+        headers: {},
+      });
+    });
+  });
+
   describe('headers', () => {
     it('returns expected header object', async () => {
       const headers = {
@@ -105,24 +118,24 @@ describe('default request logger', () => {
       });
     });
   });
-});
 
-describe('invalid url provided', () => {
-  it('throw invalid url error', async () => {
-    await fetch('http://origin.com/path/param');
-    expect(mswInspector.getRequests('invalid-path')).rejects.toThrowError(
-      '[msw-inspector] Provided path is invalid: invalid-path. Intercepted requests paths are:\n\nhttp://origin.com',
-    );
+  describe('invalid url provided', () => {
+    it('throw invalid url error', async () => {
+      await fetch('http://origin.com/path/param');
+      expect(mswInspector.getRequests('invalid-path')).rejects.toThrowError(
+        '[msw-inspector] Provided path is invalid: invalid-path. Intercepted requests paths are:\n\nhttp://origin.com',
+      );
+    });
   });
-});
 
-describe('no matching calls', () => {
-  it('throw expected error', async () => {
-    await fetch('http://origin.com/path/param');
-    expect(
-      mswInspector.getRequests('http://it.was.never.called/'),
-    ).rejects.toThrowError(
-      '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://origin.com',
-    );
+  describe('no matching calls', () => {
+    it('throw expected error', async () => {
+      await fetch('http://origin.com/path/param');
+      expect(
+        mswInspector.getRequests('http://it.was.never.called/'),
+      ).rejects.toThrowError(
+        '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://origin.com',
+      );
+    });
   });
 });
