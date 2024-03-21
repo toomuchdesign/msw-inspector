@@ -7,10 +7,10 @@ import {
   it,
   vi,
 } from 'vitest';
-import { createMSWInspector, MswInspector } from '../index';
+import { createMSWInspector } from '../index';
 import { server } from './__mocks__/server';
 
-const mswInspector: MswInspector = createMSWInspector({
+const mswInspector = createMSWInspector({
   mockSetup: server,
   mockFactory: () => vi.fn(),
 });

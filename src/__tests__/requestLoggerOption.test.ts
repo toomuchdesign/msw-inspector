@@ -7,14 +7,10 @@ import {
   it,
   vi,
 } from 'vitest';
-import {
-  createMSWInspector,
-  defaultRequestLogger,
-  MswInspector,
-} from '../index';
+import { createMSWInspector, defaultRequestLogger } from '../index';
 import { server } from './__mocks__/server';
 
-const mswInspector: MswInspector = createMSWInspector({
+const mswInspector = createMSWInspector({
   mockSetup: server,
   mockFactory: () => vi.fn(),
   requestLogger: async (req) => {

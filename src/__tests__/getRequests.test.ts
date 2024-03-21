@@ -6,11 +6,12 @@ import {
   expect,
   it,
   vi,
+  Mock,
 } from 'vitest';
-import { createMSWInspector, MswInspector } from '../index';
+import { createMSWInspector } from '../index';
 import { server } from './__mocks__/server';
 
-const mswInspector: MswInspector = createMSWInspector({
+const mswInspector = createMSWInspector({
   mockSetup: server,
   mockFactory: () => vi.fn(),
 });
@@ -150,5 +151,14 @@ describe('getRequests', () => {
         });
       });
     }
+  });
+
+  it('returns expected mock type', async () => {
+    await fetch('http://origin.com');
+
+    const actual: Mock<any, any> =
+      await mswInspector.getRequests('http://origin.com');
+
+    expect(actual).toBeTypeOf('function');
   });
 });
