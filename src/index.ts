@@ -33,6 +33,49 @@ function createMSWInspector<FunctionMock extends Function>({
     interceptedRequests.set(href, currentHrefRequest);
   }
 
+  function matchStringPath(path: string) {
+    let pathURL: URL;
+    try {
+      pathURL = new URL(path);
+    } catch (error) {
+      throw new Error(
+        makeErrorMessage({
+          message: `Provided path is invalid: ${path}`,
+          interceptedRequests,
+        }),
+      );
+    }
+    const pathRegex = pathToRegexp(pathURL.pathname);
+
+    // Look for matching intercepted requests
+    const matches: Request[] = [];
+    interceptedRequests.forEach((requests, requestHref) => {
+      const loggedRequestURL = new URL(requestHref);
+
+      // Test origins
+      if (pathURL.origin !== loggedRequestURL.origin) {
+        return;
+      }
+
+      // Test paths
+      if (pathRegex.test(loggedRequestURL.pathname)) {
+        matches.push(...requests);
+      }
+    });
+    return matches;
+  }
+
+  function matchRegexUrl(url: RegExp) {
+    const matches: Request[] = [];
+    interceptedRequests.forEach((requests) => {
+      const matchingRequests = requests.filter((request) =>
+        url.test(request.url),
+      );
+      matches.push(...matchingRequests);
+    });
+    return matches;
+  }
+
   return {
     /**
      * Return a Jest mock function holding a RequestLogRecord for each call performed against provided path.
@@ -42,38 +85,11 @@ function createMSWInspector<FunctionMock extends Function>({
      * @return {*} {Promise<FunctionMock>}
      */
     async getRequests(
-      path: string,
+      path: string | RegExp,
       { debug = true } = {},
     ): Promise<FunctionMock> {
-      let pathURL: URL;
-      try {
-        pathURL = new URL(path);
-      } catch (error) {
-        throw new Error(
-          makeErrorMessage({
-            message: `Provided path is invalid: ${path}`,
-            interceptedRequests,
-          }),
-        );
-      }
-      const pathRegex = pathToRegexp(pathURL.pathname);
-
-      // Look for matching intercepted requests
-      const matches: Request[] = [];
-      interceptedRequests.forEach((requests, requestHref) => {
-        const loggedRequestURL = new URL(requestHref);
-
-        // Test origins
-        if (pathURL.origin !== loggedRequestURL.origin) {
-          return;
-        }
-
-        // Test paths
-        if (pathRegex.test(loggedRequestURL.pathname)) {
-          matches.push(...requests);
-        }
-      });
-
+      const matches =
+        path instanceof RegExp ? matchRegexUrl(path) : matchStringPath(path);
       const functionMock = mockFactory();
 
       if (matches.length === 0) {

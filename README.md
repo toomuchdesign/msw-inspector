@@ -127,6 +127,7 @@ The matching url can be provided as:
 
 - plain absolute url string
 - [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) matching pattern
+- regular expression (also matches against query string)
 
 ```ts
 // Full string match
@@ -134,6 +135,9 @@ await mswInspector.getRequests('http://my.url/path/foo');
 
 // Url matching patter
 await mswInspector.getRequests('http://my.url/path/:param');
+
+// Url regular expression
+await mswInspector.getRequests('http://.+/path/');
 ```
 
 By default, each matching request results into a mocked function call with the following request log record:
