@@ -29,7 +29,7 @@ afterAll(() => {
 });
 
 describe('getRequests', () => {
-  describe('path matching', () => {
+  describe('url matching', () => {
     describe('origin with or without trailing slash', () => {
       it('find matching request', async () => {
         await fetch('http://origin.com');
@@ -66,9 +66,9 @@ describe('getRequests', () => {
 
     describe('url with port', () => {
       it('returns requests', async () => {
-        const path = 'http://origin.com:1234/path/param';
-        await fetch(path);
-        expect(await mswInspector.getRequests(path)).toHaveBeenCalledTimes(1);
+        const url = 'http://origin.com:1234/path/param';
+        await fetch(url);
+        expect(await mswInspector.getRequests(url)).toHaveBeenCalledTimes(1);
       });
     });
 
@@ -83,12 +83,12 @@ describe('getRequests', () => {
       });
 
       describe('less :namedParams then actual paths segments', () => {
-        it('throw expected error', async () => {
+        it('throws expected error', async () => {
           await fetch('http://origin.com/path/param');
           expect(
             mswInspector.getRequests('http://origin.com/:param1/'),
           ).rejects.toThrowError(
-            '[msw-inspector] Cannot find a matching requests for path: http://origin.com/:param1/. Intercepted requests paths are:\n\nhttp://origin.com',
+            '[msw-inspector] Cannot find a matching requests for url: http://origin.com/:param1/. Intercepted requests paths are:\n\nhttp://origin.com',
           );
         });
       });
@@ -113,21 +113,21 @@ describe('getRequests', () => {
     });
 
     describe('invalid url provided', () => {
-      it('throw invalid url error', async () => {
+      it('throws invalid url error', async () => {
         await fetch('http://origin.com/path/param');
         expect(mswInspector.getRequests('invalid-path')).rejects.toThrowError(
-          '[msw-inspector] Provided path is invalid: invalid-path. Intercepted requests paths are:\n\nhttp://origin.com',
+          '[msw-inspector] Provided url is invalid: invalid-path. Intercepted requests paths are:\n\nhttp://origin.com',
         );
       });
     });
 
     describe('requesting a url never called', () => {
-      it('throw debug error', async () => {
+      it('throws debug error', async () => {
         await fetch('http://origin.com/path/param');
         expect(
           mswInspector.getRequests('http://it.was.never.called'),
         ).rejects.toThrowError(
-          '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called. Intercepted requests paths are:\n\nhttp://origin.com',
+          '[msw-inspector] Cannot find a matching requests for url: http://it.was.never.called. Intercepted requests paths are:\n\nhttp://origin.com',
         );
       });
 
@@ -146,7 +146,7 @@ describe('getRequests', () => {
     // @NOTE SKipping locally since it involves external network requests
     if (process.env.CI) {
       describe('calling and requesting a url not registered as MSW handler', () => {
-        it('throw expected error', async () => {
+        it('throws expected error', async () => {
           await fetch(
             'https://api.github.com/repos/toomuchdesign/msw-inspector',
           );
@@ -155,7 +155,7 @@ describe('getRequests', () => {
               'https://api.github.com/repos/toomuchdesign/msw-inspector',
             ),
           ).rejects.toThrowError(
-            '[msw-inspector] Cannot find a matching requests for path: https://api.github.com/repos/toomuchdesign/msw-inspector.',
+            '[msw-inspector] Cannot find a matching requests for url: https://api.github.com/repos/toomuchdesign/msw-inspector.',
           );
         });
       });

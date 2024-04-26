@@ -133,11 +133,11 @@ The matching url can be provided as:
 // Full string match
 await mswInspector.getRequests('http://my.url/path/foo');
 
-// Url matching patter
+// Url matching pattern
 await mswInspector.getRequests('http://my.url/path/:param');
 
-// Url regular expression
-await mswInspector.getRequests('http://.+/path/');
+// Full url regular expression match
+await mswInspector.getRequests(/.+\?query=.+/);
 ```
 
 By default, each matching request results into a mocked function call with the following request log record:

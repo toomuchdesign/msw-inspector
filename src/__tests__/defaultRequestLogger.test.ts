@@ -123,7 +123,7 @@ describe('default request logger', () => {
     it('throw invalid url error', async () => {
       await fetch('http://origin.com/path/param');
       expect(mswInspector.getRequests('invalid-path')).rejects.toThrowError(
-        '[msw-inspector] Provided path is invalid: invalid-path. Intercepted requests paths are:\n\nhttp://origin.com',
+        '[msw-inspector] Provided url is invalid: invalid-path. Intercepted requests paths are:\n\nhttp://origin.com',
       );
     });
   });
@@ -134,7 +134,7 @@ describe('default request logger', () => {
       expect(
         mswInspector.getRequests('http://it.was.never.called/'),
       ).rejects.toThrowError(
-        '[msw-inspector] Cannot find a matching requests for path: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://origin.com',
+        '[msw-inspector] Cannot find a matching requests for url: http://it.was.never.called/. Intercepted requests paths are:\n\nhttp://origin.com',
       );
     });
   });
