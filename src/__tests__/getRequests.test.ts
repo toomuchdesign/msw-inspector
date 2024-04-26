@@ -103,6 +103,15 @@ describe('getRequests', () => {
       });
     });
 
+    describe('matching regexp', () => {
+      it('find matching request', async () => {
+        await fetch('http://origin.com/path/param?query=value');
+        expect(
+          await mswInspector.getRequests(/.+\?query=.+/),
+        ).toHaveBeenCalledTimes(1);
+      });
+    });
+
     describe('invalid url provided', () => {
       it('throw invalid url error', async () => {
         await fetch('http://origin.com/path/param');
