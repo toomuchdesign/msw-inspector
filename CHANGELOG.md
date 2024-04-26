@@ -1,8 +1,14 @@
-# 3.1.0
+# 3.2.0
 
 ### New Features
 
 - `mswInspector.getRequests`: support full url match via regex
+
+# 3.1.0
+
+### New Features
+
+- Improve error message when `request.body` is already read
 
 # 3.0.0
 
