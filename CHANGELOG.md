@@ -1,3 +1,9 @@
+# 3.1.0
+
+### New Features
+
+- `mswInspector.getRequests`: support full url match via regex
+
 # 3.0.0
 
 ### Breaking change

@@ -33,14 +33,14 @@ function createMSWInspector<FunctionMock extends Function>({
     interceptedRequests.set(href, currentHrefRequest);
   }
 
-  function matchStringPath(path: string) {
+  function matchStringUrl(url: string): Request[] {
     let pathURL: URL;
     try {
-      pathURL = new URL(path);
+      pathURL = new URL(url);
     } catch (error) {
       throw new Error(
         makeErrorMessage({
-          message: `Provided path is invalid: ${path}`,
+          message: `Provided url is invalid: ${url}`,
           interceptedRequests,
         }),
       );
@@ -65,7 +65,7 @@ function createMSWInspector<FunctionMock extends Function>({
     return matches;
   }
 
-  function matchRegexUrl(url: RegExp) {
+  function matchRegexUrl(url: RegExp): Request[] {
     const matches: Request[] = [];
     interceptedRequests.forEach((requests) => {
       const matchingRequests = requests.filter((request) =>
@@ -81,22 +81,22 @@ function createMSWInspector<FunctionMock extends Function>({
      * Return a Jest mock function holding a RequestLogRecord for each call performed against provided path.
      * Network requested are spied through msw listeners
      *
-     * @param {string} path Path of a network request (`/path`)
+     * @param {string | RegExp} url Url of a network request (`http://origin.com/path`)
      * @return {*} {Promise<FunctionMock>}
      */
     async getRequests(
-      path: string | RegExp,
+      url: string | RegExp,
       { debug = true } = {},
     ): Promise<FunctionMock> {
       const matches =
-        path instanceof RegExp ? matchRegexUrl(path) : matchStringPath(path);
+        url instanceof RegExp ? matchRegexUrl(url) : matchStringUrl(url);
       const functionMock = mockFactory();
 
       if (matches.length === 0) {
         if (debug) {
           throw new Error(
             makeErrorMessage({
-              message: `Cannot find a matching requests for path: ${path}`,
+              message: `Cannot find a matching requests for url: ${url}`,
               interceptedRequests,
             }),
           );
