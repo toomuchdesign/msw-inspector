@@ -165,7 +165,7 @@ describe('getRequests', () => {
   it('returns expected mock type', async () => {
     await fetch('http://origin.com');
 
-    const actual: Mock<any, any> =
+    const actual: Mock<any> =
       await mswInspector.getRequests('http://origin.com');
 
     expect(actual).toBeTypeOf('function');
