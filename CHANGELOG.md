@@ -1,23 +1,25 @@
-# 3.2.0
+# msw-inspector
+
+## 3.2.0
 
 ### New Features
 
 - `mswInspector.getRequests`: support full url match via regex
 
-# 3.1.0
+## 3.1.0
 
 ### New Features
 
 - Improve error message when `request.body` is already read
 
-# 3.0.0
+## 3.0.0
 
 ### Breaking change
 
 - Support `msw` v2+
 - `mswInspector.getRequests` method switched from sync to async
 
-# 2.0.0
+## 2.0.0
 
 ### Breaking change
 
@@ -31,18 +33,18 @@
 - `debug` option added
 - Throw error when invalid URL provided
 
-# 1.0.0
+## 1.0.0
 
 ### Breaking change
 
 - Support `msw` v1+
 
-# 0.1.0
+## 0.1.0
 
 ### New Features
 
 - Add `requestLogger` option to customize inspection results
 
-# 0.0.1
+## 0.0.1
 
 Initial release

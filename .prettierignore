@@ -5,3 +5,4 @@ package-lock.json
 dist/
 package/
 coverage/
+CHANGELOG.md
