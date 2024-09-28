@@ -1,7 +1,6 @@
 import qs, { ParsedQs } from 'qs';
-import { makeErrorMessage } from './makeErrorMessage';
 
-export type DefaultRequestRecord = {
+type DefaultRequestRecord = {
   method: string;
   headers: Record<string, string>;
   body?: any;
