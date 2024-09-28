@@ -17,7 +17,7 @@ export function matchStringUrl({
   } catch (error) {
     throw new Error(
       makeErrorMessage({
-        message: `Provided url is invalid: ${url}`,
+        message: `Provided url is invalid: "${url}"`,
         interceptedRequests,
       }),
     );

@@ -86,7 +86,7 @@ describe('getRequests', () => {
         expect(
           mswInspector.getRequests('http://origin.com/:param1/'),
         ).rejects.toThrowError(
-          '[msw-inspector] Cannot find a matching requests for url: http://origin.com/:param1/. Intercepted requests paths are:\n\nhttp://origin.com',
+          '[msw-inspector] Cannot find a matching requests for url: "http://origin.com/:param1/". Intercepted requests paths are:\n\nhttp://origin.com',
         );
       });
     });
@@ -104,7 +104,7 @@ describe('getRequests', () => {
       it('throws invalid url error', async () => {
         await fetch('http://origin.com/path/param');
         expect(mswInspector.getRequests('invalid-path')).rejects.toThrowError(
-          '[msw-inspector] Provided url is invalid: invalid-path. Intercepted requests paths are:\n\nhttp://origin.com',
+          '[msw-inspector] Provided url is invalid: "invalid-path". Intercepted requests paths are:\n\nhttp://origin.com',
         );
       });
     });
@@ -124,7 +124,7 @@ describe('getRequests', () => {
         expect(
           mswInspector.getRequests(/.+\?non-matching=.+/),
         ).rejects.toThrowError(
-          '[msw-inspector] Cannot find a matching requests for url: /.+\\?non-matching=.+/. Intercepted requests paths are:\n\nhttp://origin.com/path/param?query=value',
+          '[msw-inspector] Cannot find a matching requests for url: "/.+\\?non-matching=.+/". Intercepted requests paths are:\n\nhttp://origin.com/path/param?query=value',
         );
       });
     });
@@ -136,7 +136,7 @@ describe('getRequests', () => {
       expect(
         mswInspector.getRequests('http://it.was.never.called'),
       ).rejects.toThrowError(
-        '[msw-inspector] Cannot find a matching requests for url: http://it.was.never.called. Intercepted requests paths are:\n\nhttp://origin.com',
+        '[msw-inspector] Cannot find a matching requests for url: "http://it.was.never.called". Intercepted requests paths are:\n\nhttp://origin.com',
       );
     });
 
@@ -162,7 +162,7 @@ describe('getRequests', () => {
             'https://api.github.com/repos/toomuchdesign/msw-inspector',
           ),
         ).rejects.toThrowError(
-          '[msw-inspector] Cannot find a matching requests for url: https://api.github.com/repos/toomuchdesign/msw-inspector.',
+          '[msw-inspector] Cannot find a matching requests for url: "https://api.github.com/repos/toomuchdesign/msw-inspector".',
         );
       });
     });

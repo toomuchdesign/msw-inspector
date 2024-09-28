@@ -55,7 +55,7 @@ function createMSWInspector<FunctionMock extends Function>({
         if (debug) {
           throw new Error(
             makeErrorMessage({
-              message: `Cannot find a matching requests for url: ${url}`,
+              message: `Cannot find a matching requests for url: "${url}"`,
               interceptedRequests,
             }),
           );
