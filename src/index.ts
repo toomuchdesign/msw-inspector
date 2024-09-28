@@ -1,10 +1,10 @@
 import type { LifeCycleEventsMap } from 'msw';
 import type { SetupWorker } from 'msw/browser';
 import type { SetupServer } from 'msw/node';
-import { pathToRegexp } from 'path-to-regexp';
 import { defaultRequestLogger } from './defaultRequestLogger';
 import { makeErrorMessage } from './makeErrorMessage';
-
+import { matchStringUrl } from './matchStringUrl';
+import { matchRegexUrl } from './matchRegexUrl';
 type MockedRequest = LifeCycleEventsMap['request:match'][0]['request'];
 
 /**
@@ -33,49 +33,6 @@ function createMSWInspector<FunctionMock extends Function>({
     interceptedRequests.set(href, currentHrefRequest);
   }
 
-  function matchStringUrl(url: string): Request[] {
-    let pathURL: URL;
-    try {
-      pathURL = new URL(url);
-    } catch (error) {
-      throw new Error(
-        makeErrorMessage({
-          message: `Provided url is invalid: ${url}`,
-          interceptedRequests,
-        }),
-      );
-    }
-    const pathRegex = pathToRegexp(pathURL.pathname);
-
-    // Look for matching intercepted requests
-    const matches: Request[] = [];
-    interceptedRequests.forEach((requests, requestHref) => {
-      const loggedRequestURL = new URL(requestHref);
-
-      // Test origins
-      if (pathURL.origin !== loggedRequestURL.origin) {
-        return;
-      }
-
-      // Test paths
-      if (pathRegex.test(loggedRequestURL.pathname)) {
-        matches.push(...requests);
-      }
-    });
-    return matches;
-  }
-
-  function matchRegexUrl(url: RegExp): Request[] {
-    const matches: Request[] = [];
-    interceptedRequests.forEach((requests) => {
-      const matchingRequests = requests.filter((request) =>
-        url.test(request.url),
-      );
-      matches.push(...matchingRequests);
-    });
-    return matches;
-  }
-
   return {
     /**
      * Return a Jest mock function holding a RequestLogRecord for each call performed against provided path.
@@ -89,7 +46,9 @@ function createMSWInspector<FunctionMock extends Function>({
       { debug = true } = {},
     ): Promise<FunctionMock> {
       const matches =
-        url instanceof RegExp ? matchRegexUrl(url) : matchStringUrl(url);
+        url instanceof RegExp
+          ? matchRegexUrl({ url, interceptedRequests })
+          : matchStringUrl({ url, interceptedRequests });
       const functionMock = mockFactory();
 
       if (matches.length === 0) {
