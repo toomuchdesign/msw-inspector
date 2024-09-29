@@ -135,6 +135,7 @@ await mswInspector.getRequests('http://my.url/path/foo');
 
 // path-to-regexp v7 url matching pattern
 await mswInspector.getRequests('http://my.url/path/:param');
+await mswInspector.getRequests('http://my.url/path/*');
 
 // Full url regular expression match
 await mswInspector.getRequests(/.+\?query=.+/);
