@@ -7,6 +7,7 @@ import {
   it,
   vi,
   Mock,
+  expectTypeOf,
 } from 'vitest';
 import { createMSWInspector } from '../index';
 import { server } from './__mocks__/server';
@@ -29,8 +30,8 @@ afterAll(() => {
 });
 
 describe('getRequests', () => {
-  describe('URL origin with or without trailing slash', () => {
-    it('find matching request', async () => {
+  describe('URL origin without trailing slash', () => {
+    it('find matching request with and without slash', async () => {
       await fetch('http://origin.com');
 
       expect(
@@ -42,16 +43,35 @@ describe('getRequests', () => {
     });
   });
 
+  describe('URL origin with trailing slash', () => {
+    it('find matching request with and without slash', async () => {
+      await fetch('http://origin.com/');
+
+      expect(
+        await mswInspector.getRequests('http://origin.com'),
+      ).toHaveBeenCalledTimes(1);
+      expect(
+        await mswInspector.getRequests('http://origin.com/'),
+      ).toHaveBeenCalledTimes(1);
+    });
+  });
+
   describe('URL with port', () => {
-    it('returns requests', async () => {
-      const url = 'http://origin.com:1234/path/param';
+    it('find matching request', async () => {
+      const url = 'http://origin.com:1234';
+      await fetch(url);
+      expect(await mswInspector.getRequests(url)).toHaveBeenCalledTimes(1);
+    });
+
+    it('find matching request', async () => {
+      const url = 'http://origin.com:1234/path';
       await fetch(url);
       expect(await mswInspector.getRequests(url)).toHaveBeenCalledTimes(1);
     });
   });
 
   describe('multiple matching calls', () => {
-    it('preserves calls order', async () => {
+    it('preserve call order', async () => {
       await fetch('http://origin.com', { headers: { id: 'first' } });
       await fetch('http://origin.com', { headers: { id: 'second' } });
       await fetch('http://origin.com', { headers: { id: 'third' } });
@@ -70,69 +90,84 @@ describe('getRequests', () => {
     });
   });
 
-  describe('String urls', () => {
-    describe('multiple :namedParams', () => {
+  describe('path matching', () => {
+    describe('String urls', () => {
+      describe('multiple :namedParams', () => {
+        it('find matching request', async () => {
+          await fetch('http://origin.com/one/two/three');
+          expect(
+            await mswInspector.getRequests(
+              'http://origin.com/:param1/:param2/:param3',
+            ),
+          ).toHaveBeenCalledTimes(1);
+        });
+      });
+
+      describe('less :namedParams then actual path segments', () => {
+        it('throw expected error', async () => {
+          await fetch('http://origin.com/one/two');
+          expect(
+            mswInspector.getRequests('http://origin.com/:param1/'),
+          ).rejects.toThrowError(
+            '[msw-inspector] Cannot find a matching requests for url: "http://origin.com/:param1/". Intercepted requests paths are:\n\nhttp://origin.com',
+          );
+        });
+      });
+
+      describe('wildcard (*)', () => {
+        it('find matching request', async () => {
+          await fetch('http://origin.com/one/two');
+          expect(
+            await mswInspector.getRequests('http://origin.com/*'),
+          ).toHaveBeenCalledTimes(1);
+        });
+
+        describe('mixed :namedParams and wildcard', () => {
+          it('find matching request', async () => {
+            await fetch('http://origin.com/one/two/three');
+            expect(
+              await mswInspector.getRequests(
+                'http://origin.com/:param1/*/:param3',
+              ),
+            ).toHaveBeenCalledTimes(1);
+          });
+        });
+      });
+
+      describe('malformed url provided', () => {
+        it('throw invalid url error', async () => {
+          await fetch('http://origin.com/one/two');
+          expect(mswInspector.getRequests('invalid-path')).rejects.toThrowError(
+            '[msw-inspector] Provided url is invalid: "invalid-path". Intercepted requests paths are:\n\nhttp://origin.com',
+          );
+        });
+      });
+    });
+
+    describe('RegExp urls', () => {
       it('find matching request', async () => {
-        await fetch('http://origin.com/path/param');
+        await fetch('http://origin.com/one/two?query=value');
         expect(
-          await mswInspector.getRequests('http://origin.com/:param1/:param2'),
+          await mswInspector.getRequests(/.+\?query=.+/),
         ).toHaveBeenCalledTimes(1);
       });
-    });
 
-    describe('less :namedParams then actual paths segments', () => {
-      it('throws expected error', async () => {
-        await fetch('http://origin.com/path/param');
-        expect(
-          mswInspector.getRequests('http://origin.com/:param1/'),
-        ).rejects.toThrowError(
-          '[msw-inspector] Cannot find a matching requests for url: "http://origin.com/:param1/". Intercepted requests paths are:\n\nhttp://origin.com',
-        );
-      });
-    });
-
-    describe('wildcard (.*)', () => {
-      it('find matching request', async () => {
-        await fetch('http://origin.com/path/param');
-        expect(
-          await mswInspector.getRequests('http://origin.com/*'),
-        ).toHaveBeenCalledTimes(1);
-      });
-    });
-
-    describe('malformed url provided', () => {
-      it('throws invalid url error', async () => {
-        await fetch('http://origin.com/path/param');
-        expect(mswInspector.getRequests('invalid-path')).rejects.toThrowError(
-          '[msw-inspector] Provided url is invalid: "invalid-path". Intercepted requests paths are:\n\nhttp://origin.com',
-        );
-      });
-    });
-  });
-
-  describe('RegExp urls', () => {
-    it('find matching request', async () => {
-      await fetch('http://origin.com/path/param?query=value');
-      expect(
-        await mswInspector.getRequests(/.+\?query=.+/),
-      ).toHaveBeenCalledTimes(1);
-    });
-
-    describe('non-matching regex', () => {
-      it('throws expected error', async () => {
-        await fetch('http://origin.com/path/param?query=value');
-        expect(
-          mswInspector.getRequests(/.+\?non-matching=.+/),
-        ).rejects.toThrowError(
-          '[msw-inspector] Cannot find a matching requests for url: "/.+\\?non-matching=.+/". Intercepted requests paths are:\n\nhttp://origin.com/path/param?query=value',
-        );
+      describe('non-matching regex', () => {
+        it('throw expected error', async () => {
+          await fetch('http://origin.com/one/two?query=value');
+          expect(
+            mswInspector.getRequests(/.+\?non-matching=.+/),
+          ).rejects.toThrowError(
+            '[msw-inspector] Cannot find a matching requests for url: "/.+\\?non-matching=.+/". Intercepted requests paths are:\n\nhttp://origin.com/one/two?query=value',
+          );
+        });
       });
     });
   });
 
   describe('requesting a url never called', () => {
-    it('throws debug error', async () => {
-      await fetch('http://origin.com/path/param');
+    it('throw debug error', async () => {
+      await fetch('http://origin.com/one/two');
       expect(
         mswInspector.getRequests('http://it.was.never.called'),
       ).rejects.toThrowError(
@@ -141,8 +176,8 @@ describe('getRequests', () => {
     });
 
     describe('"debug" option === false', () => {
-      it('returns empty mock', async () => {
-        await fetch('http://origin.com/path/param');
+      it('return empty mock', async () => {
+        await fetch('http://origin.com/one/two');
         expect(
           await mswInspector.getRequests('http://it.was.never.called', {
             debug: false,
@@ -155,7 +190,7 @@ describe('getRequests', () => {
   // @NOTE SKipping locally since it involves external network requests
   if (process.env.CI) {
     describe('calling and requesting a url not registered as MSW handler', () => {
-      it('throws expected error', async () => {
+      it('throw expected error', async () => {
         await fetch('https://api.github.com/repos/toomuchdesign/msw-inspector');
         expect(
           mswInspector.getRequests(
@@ -168,12 +203,11 @@ describe('getRequests', () => {
     });
   }
 
-  it('returns expected mock type', async () => {
+  it('return expected mock type', async () => {
     await fetch('http://origin.com');
 
-    const actual: Mock<any> =
-      await mswInspector.getRequests('http://origin.com');
-
-    expect(actual).toBeTypeOf('function');
+    const actual = await mswInspector.getRequests('http://origin.com');
+    expectTypeOf(actual).toMatchTypeOf<Mock<any>>();
+    expectTypeOf(actual).toBeFunction();
   });
 });
