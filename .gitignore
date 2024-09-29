@@ -6,6 +6,7 @@ node_modules
 dist
 package
 coverage
+*-temp.json
 
 # Trailing dotted files
 !.all-contributorsrc
