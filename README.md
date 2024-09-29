@@ -126,7 +126,7 @@ Returns a promise returning a mocked function pre-called with all the request re
 The matching url can be provided as:
 
 - plain absolute url string
-- [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) matching pattern
+- [path-to-regexp v7](https://github.com/pillarjs/path-to-regexp/tree/v7.2.0) matching pattern
 - regular expression (also matches against query string)
 
 ```ts
