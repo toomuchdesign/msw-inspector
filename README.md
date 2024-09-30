@@ -125,16 +125,17 @@ Returns a promise returning a mocked function pre-called with all the request re
 
 The matching url can be provided as:
 
-- plain absolute url string
-- [path-to-regexp](https://www.npmjs.com/package/path-to-regexp) matching pattern
-- regular expression (also matches against query string)
+- Full string match
+- [path-to-regexp v7](https://github.com/pillarjs/path-to-regexp/tree/v7.2.0) url matching pattern
+- Full url regular expression match (matching against query string, too)
 
 ```ts
 // Full string match
 await mswInspector.getRequests('http://my.url/path/foo');
 
-// Url matching pattern
+// path-to-regexp v7 url matching pattern
 await mswInspector.getRequests('http://my.url/path/:param');
+await mswInspector.getRequests('http://my.url/path/*');
 
 // Full url regular expression match
 await mswInspector.getRequests(/.+\?query=.+/);

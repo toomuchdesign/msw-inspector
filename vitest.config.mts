@@ -3,7 +3,7 @@ import { defineConfig, defaultInclude } from 'vitest/config';
 export default defineConfig({
   test: {
     setupFiles: ['vitest.setup.ts'],
-    testTimeout: 200,
+    testTimeout: process.env.CI ? 1000 : 200,
     coverage: {
       provider: 'v8',
       include: ['src'],
