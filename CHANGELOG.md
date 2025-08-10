@@ -1,5 +1,11 @@
 # msw-inspector
 
+## 3.3.0
+
+### Minor Changes
+
+- 5d132db: Wrap message error urls in double quotes
+
 ## 3.2.0
 
 ### New Features
