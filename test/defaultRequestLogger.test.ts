@@ -7,8 +7,8 @@ import {
   it,
   vi,
 } from 'vitest';
-import { createMSWInspector } from '../index';
-import { server } from './__mocks__/server';
+import { createMSWInspector } from '../src/index';
+import { server } from './mocks/server';
 
 const mswInspector = createMSWInspector({
   mockSetup: server,
@@ -122,7 +122,9 @@ describe('default request logger', () => {
   describe('invalid url provided', () => {
     it('throw invalid url error', async () => {
       await fetch('http://origin.com/path/param');
-      expect(mswInspector.getRequests('invalid-path')).rejects.toThrowError(
+      await expect(
+        mswInspector.getRequests('invalid-path'),
+      ).rejects.toThrowError(
         '[msw-inspector] Provided url is invalid: "invalid-path". Intercepted requests paths are:\n\nhttp://origin.com',
       );
     });
@@ -131,7 +133,7 @@ describe('default request logger', () => {
   describe('no matching calls', () => {
     it('throw expected error', async () => {
       await fetch('http://origin.com/path/param');
-      expect(
+      await expect(
         mswInspector.getRequests('http://it.was.never.called/'),
       ).rejects.toThrowError(
         '[msw-inspector] Cannot find a matching requests for url: "http://it.was.never.called/". Intercepted requests paths are:\n\nhttp://origin.com',
@@ -146,7 +148,7 @@ describe('default request logger', () => {
         body: JSON.stringify({ hello: 'world' }),
       });
 
-      expect(
+      await expect(
         mswInspector.getRequests('http://origin.com/used-body'),
       ).rejects.toThrowError(
         '[msw-inspector] request.body already read. Make sure your msw handlers clone the request with "request.clone()" before they read the body.',

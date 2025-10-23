@@ -7,8 +7,8 @@ import {
   it,
   vi,
 } from 'vitest';
-import { createMSWInspector, defaultRequestLogger } from '../index';
-import { server } from './__mocks__/server';
+import { createMSWInspector, defaultRequestLogger } from '../src/index';
+import { server } from './mocks/server';
 
 const mswInspector = createMSWInspector({
   mockSetup: server,

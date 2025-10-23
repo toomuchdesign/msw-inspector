@@ -9,8 +9,8 @@ import {
   Mock,
   expectTypeOf,
 } from 'vitest';
-import { createMSWInspector } from '../index';
-import { server } from './__mocks__/server';
+import { createMSWInspector } from '../src/index';
+import { server } from './mocks/server';
 
 const mswInspector = createMSWInspector({
   mockSetup: server,
@@ -106,7 +106,7 @@ describe('getRequests', () => {
       describe('less :namedParams then actual path segments', () => {
         it('throw expected error', async () => {
           await fetch('http://origin.com/one/two');
-          expect(
+          await expect(
             mswInspector.getRequests('http://origin.com/:param1/'),
           ).rejects.toThrowError(
             '[msw-inspector] Cannot find a matching requests for url: "http://origin.com/:param1/". Intercepted requests paths are:\n\nhttp://origin.com',
@@ -137,7 +137,9 @@ describe('getRequests', () => {
       describe('malformed url provided', () => {
         it('throw invalid url error', async () => {
           await fetch('http://origin.com/one/two');
-          expect(mswInspector.getRequests('invalid-path')).rejects.toThrowError(
+          await expect(
+            mswInspector.getRequests('invalid-path'),
+          ).rejects.toThrowError(
             '[msw-inspector] Provided url is invalid: "invalid-path". Intercepted requests paths are:\n\nhttp://origin.com',
           );
         });
@@ -155,7 +157,7 @@ describe('getRequests', () => {
       describe('non-matching regex', () => {
         it('throw expected error', async () => {
           await fetch('http://origin.com/one/two?query=value');
-          expect(
+          await expect(
             mswInspector.getRequests(/.+\?non-matching=.+/),
           ).rejects.toThrowError(
             '[msw-inspector] Cannot find a matching requests for url: "/.+\\?non-matching=.+/". Intercepted requests paths are:\n\nhttp://origin.com/one/two?query=value',
@@ -168,7 +170,7 @@ describe('getRequests', () => {
   describe('requesting a url never called', () => {
     it('throw debug error', async () => {
       await fetch('http://origin.com/one/two');
-      expect(
+      await expect(
         mswInspector.getRequests('http://it.was.never.called'),
       ).rejects.toThrowError(
         '[msw-inspector] Cannot find a matching requests for url: "http://it.was.never.called". Intercepted requests paths are:\n\nhttp://origin.com',
@@ -192,7 +194,7 @@ describe('getRequests', () => {
     describe('calling and requesting a url not registered as MSW handler', () => {
       it('throw expected error', async () => {
         await fetch('https://api.github.com/repos/toomuchdesign/msw-inspector');
-        expect(
+        await expect(
           mswInspector.getRequests(
             'https://api.github.com/repos/toomuchdesign/msw-inspector',
           ),

@@ -1,5 +1,5 @@
 import { beforeAll, afterAll, afterEach } from 'vitest';
-import { server } from './src/__tests__/__mocks__/server';
+import { server } from './test/mocks/server';
 
 // https://mswjs.io/docs/getting-started/integrate/node
 // Establish API mocking before all tests.
