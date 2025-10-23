@@ -58,7 +58,7 @@
     "node": ">=18"
   },
   "dependencies": {
-    "path-to-regexp": "^7.1.0",
+    "path-to-regexp": "^8.0.0",
     "qs": "^6.11.2"
   }
 }
