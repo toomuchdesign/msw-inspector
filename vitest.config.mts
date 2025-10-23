@@ -2,6 +2,7 @@ import { defineConfig, defaultInclude } from 'vitest/config';
 
 export default defineConfig({
   test: {
+    dir: 'test',
     setupFiles: ['vitest.setup.ts'],
     testTimeout: process.env.CI ? 1000 : 200,
     coverage: {

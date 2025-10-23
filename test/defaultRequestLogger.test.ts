@@ -7,8 +7,8 @@ import {
   it,
   vi,
 } from 'vitest';
-import { createMSWInspector } from '../index';
-import { server } from './__mocks__/server';
+import { createMSWInspector } from '../src/index';
+import { server } from './mocks/server';
 
 const mswInspector = createMSWInspector({
   mockSetup: server,
