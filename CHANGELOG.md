@@ -1,5 +1,11 @@
 # msw-inspector
 
+## 3.3.0
+
+### Minor Changes
+
+- [#250](https://github.com/toomuchdesign/msw-inspector/pull/250) [`5d132db`](https://github.com/toomuchdesign/msw-inspector/commit/5d132db541bb61e4148724ac0f36fe5be628844c) Thanks [@toomuchdesign](https://github.com/toomuchdesign)! - Wrap message error urls in double quotes
+
 ## 3.2.0
 
 ### New Features
