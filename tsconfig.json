@@ -2,6 +2,9 @@
   "extends": "@tsconfig/node18/tsconfig.json",
   "compilerOptions": {
     "baseUrl": ".",
+    "paths": {
+      "*": ["./*"]
+    },
     "noErrorTruncation": true
   },
   "exclude": ["./dist"]
